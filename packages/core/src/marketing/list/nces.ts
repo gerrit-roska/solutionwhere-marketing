@@ -1,4 +1,4 @@
-import { domainOf, recordRun, upsertAccount } from "./shared";
+import { CRAWL_USER_AGENT, domainOf, recordRun, upsertAccount } from "./shared";
 
 // NCES CCD LEA universe — the spine of the district list (06 §2.1).
 //
@@ -43,7 +43,10 @@ export async function runNces(): Promise<void> {
     let url: string | null =
       `https://educationdata.urban.org/api/v1/school-districts/ccd/directory/${START_YEAR}/`;
     while (url) {
-      const response = await fetch(url);
+      // The API 403s node's default UA; a browser UA passes.
+      const response = await fetch(url, {
+        headers: { "User-Agent": CRAWL_USER_AGENT },
+      });
       if (!response.ok) {
         throw new Error(`Urban CCD API failed: ${response.status} at ${url}`);
       }
