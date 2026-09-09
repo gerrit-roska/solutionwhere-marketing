@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Google Ads Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      /* Brand tokens: overridden at render time from data.json (config-driven). */
+      --brand-primary: #1a1a1a;
+      --brand-accent: #4a4a4a;
+      --surface: #ffffff;
+      --text-dark: #1a1a1a;
+      --text-muted: #666;
+      --border-color: #e0e0e0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--surface);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+    header { margin-bottom: 32px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 44px; height: 44px; background: var(--brand-primary); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 18px; flex: none;
+    }
+    h1 { color: var(--brand-primary); font-size: 28px; font-weight: 600; letter-spacing: -0.5px; }
+    .subtitle { color: var(--text-muted); font-size: 15px; }
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px; margin-bottom: 32px;
+    }
+    .stat-card {
+      background: white; border-radius: 12px; padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border-color);
+    }
+    .stat-value { font-size: 30px; font-weight: 700; color: var(--brand-primary); line-height: 1.2; }
+    .stat-value .vs { font-size: 14px; font-weight: 500; color: var(--text-muted); }
+    .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+    .card {
+      background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 24px;
+    }
+    .card-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border-color);
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .card-title { font-size: 16px; font-weight: 600; }
+    .card-note { font-size: 12px; color: var(--text-muted); }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 16px; text-align: left; white-space: nowrap; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    th {
+      background: #f5f5f5; font-weight: 600; font-size: 12px; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 1px solid var(--border-color);
+    }
+    tr:not(:last-child) td { border-bottom: 1px solid var(--border-color); }
+    .pill {
+      display: inline-block; padding: 3px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 500;
+    }
+    .pill-enabled { background: #e8f5e9; color: #2e7d32; }
+    .pill-paused { background: #fff3e0; color: #e65100; }
+    .pill-other { background: #eceff1; color: #546e7a; }
+    .empty { text-align: center; color: var(--text-muted); padding: 48px 20px; }
+    .empty strong { display: block; font-size: 16px; color: var(--text-dark); margin-bottom: 6px; }
+    .last-updated { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+    @media (max-width: 768px) {
+      .container { padding: 20px 14px; }
+      h1 { font-size: 22px; }
+      th, td { padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="brand-logo" id="logo"></div>
+        <div>
+          <h1 id="title">Google Ads</h1>
+          <p class="subtitle" id="subtitle">Search campaign performance</p>
+        </div>
+      </div>
+      <p class="last-updated" id="generated"></p>
+    </header>
+    <div id="body"></div>
+  </div>
+  <script type="module">
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const usd = (n) => n == null ? '-' : '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+    const int = (n) => n == null ? '-' : Number(n).toLocaleString('en-US');
+    const statusPill = (s) => {
+      const cls = s === 'ENABLED' ? 'pill-enabled' : s === 'PAUSED' ? 'pill-paused' : 'pill-other';
+      return `<span class="pill ${cls}">${esc(s)}</span>`;
+    };
+
+    // report.ts also emits a self-contained dashboard/report.html with the data
+    // inlined as window.__DASHBOARD_DATA__ so the file opens directly (file://,
+    // no server). The served page falls back to fetching the co-located JSON.
+    const embedded = window.__DASHBOARD_DATA__;
+    const res = embedded ? null : await fetch('./data.json').catch(() => null);
+    const data = embedded ?? (res && res.ok ? await res.json() : null);
+
+    const brand = data?.brand ?? {};
+    if (brand.primary) document.documentElement.style.setProperty('--brand-primary', brand.primary);
+    if (brand.accent) document.documentElement.style.setProperty('--brand-accent', brand.accent);
+    document.getElementById('logo').textContent = brand.initials ?? '';
+    document.getElementById('title').textContent = data?.title ?? 'Google Ads';
+    document.title = data?.title ?? 'Google Ads Dashboard';
+
+    const body = document.getElementById('body');
+    if (!data) {
+      body.innerHTML = `<div class="card"><div class="empty"><strong>No data yet</strong>
+        Run <code>npm run report -- --client &lt;slug&gt;</code> to generate dashboard/data.json.</div></div>`;
+    } else {
+      document.getElementById('subtitle').textContent =
+        `Search campaign performance, last ${data.lookbackDays ?? 30} days`;
+      document.getElementById('generated').textContent = 'Generated ' + data.generatedAt;
+
+      const t = data.totals ?? {};
+      const cpa = t.conversions > 0 ? t.cost / t.conversions : null;
+      const stats = `
+        <div class="stats">
+          <div class="stat-card"><div class="stat-value">${usd(t.cost)}</div><div class="stat-label">Spend</div></div>
+          <div class="stat-card"><div class="stat-value">${int(t.conversions)}</div><div class="stat-label">Conversions</div></div>
+          <div class="stat-card"><div class="stat-value">${cpa == null ? '-' : usd(cpa)}
+            <span class="vs">/ ${usd(data.targetCpa)} target</span></div><div class="stat-label">Cost per conversion</div></div>
+          <div class="stat-card"><div class="stat-value">${int(t.clicks)}</div><div class="stat-label">Clicks</div></div>
+          <div class="stat-card"><div class="stat-value">${int(t.impressions)}</div><div class="stat-label">Impressions</div></div>
+        </div>`;
+
+      const campaignRows = (data.campaigns ?? []).map((c) => `
+        <tr><td><strong>${esc(c.name)}</strong></td><td>${statusPill(c.status)}</td>
+        <td class="num">${usd(c.dailyBudget)}</td><td class="num">${usd(c.cost)}</td>
+        <td class="num">${int(c.clicks)}</td><td class="num">${int(c.conversions)}</td></tr>`).join('');
+      const campaigns = `
+        <div class="card"><div class="card-header"><h2 class="card-title">Campaigns</h2></div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Campaign</th><th>Status</th><th class="num">Daily budget</th>
+          <th class="num">Spend</th><th class="num">Clicks</th><th class="num">Conversions</th></tr></thead>
+          <tbody>${campaignRows || `<tr><td colspan="6" class="empty">No campaigns found</td></tr>`}</tbody>
+        </table></div></div>`;
+
+      const winnerRows = (data.winners ?? []).map((w) => `
+        <tr><td><strong>${esc(w.searchTerm)}</strong></td><td>${esc(w.adGroup ?? '')}</td>
+        <td class="num">${int(w.clicks)}</td><td class="num">${usd(w.cost)}</td>
+        <td class="num">${int(w.conversions)}</td><td class="num">${usd(w.costPerConversion)}</td></tr>`).join('');
+      const winners = `
+        <div class="card"><div class="card-header"><h2 class="card-title">Winner candidates</h2>
+        <span class="card-note">converting search terms at/below target CPA, pending human review</span></div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Search term</th><th>Ad group</th><th class="num">Clicks</th>
+          <th class="num">Spend</th><th class="num">Conversions</th><th class="num">CPA</th></tr></thead>
+          <tbody>${winnerRows || `<tr><td colspan="6" class="empty">None in this window</td></tr>`}</tbody>
+        </table></div></div>`;
+
+      const wasteRows = (data.waste ?? []).map((w) => `
+        <tr><td><strong>${esc(w.searchTerm)}</strong></td>
+        <td class="num">${int(w.clicks)}</td><td class="num">${usd(w.cost)}</td></tr>`).join('');
+      const waste = `
+        <div class="card"><div class="card-header"><h2 class="card-title">Waste candidates</h2>
+        <span class="card-note">spend with zero conversions, proposed negatives pending review</span></div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Search term</th><th class="num">Clicks</th><th class="num">Wasted spend</th></tr></thead>
+          <tbody>${wasteRows || `<tr><td colspan="3" class="empty">None in this window</td></tr>`}</tbody>
+        </table></div></div>`;
+
+      body.innerHTML = stats + campaigns + winners + waste;
+    }
+  </script>
+</body>
+</html>

@@ -28,15 +28,16 @@ services:
 # no far-future-cron parking. LLM + vendor calls run through the Graphed
 # proxy/Tools; no vendor keys are declared.
 jobs:
-  # SEO kit: drafts one article per weekday into seo_articles (cms: none —
-  # zero external writes until the publishing path is approved).
-  seo-publish-daily:
-    command: npm run job:seo-publish-daily
-    schedule:
-      cron: 0 12 * * 1-5
-      timezone: America/New_York
-    retries: 0
-    timeout_seconds: 1800
+  # SEO drafting cron is PAUSED (removed per Gerrit, 2026-09-09) until the
+  # publishing connection/decision lands — the site is Next.js with no CMS,
+  # so drafts have nowhere to go yet. Deletion is the only real off switch;
+  # run one-offs with `graphed dev run -- npm run job:seo-publish-daily`.
+  # Re-add this block to resume:
+  #   seo-publish-daily:
+  #     command: npm run job:seo-publish-daily
+  #     schedule: { cron: 0 12 * * 1-5, timezone: America/New_York }
+  #     retries: 0
+  #     timeout_seconds: 1800
 
   # Named-account list pipeline: one source per night (NCES / AESA / staff
   # directories), tracked in source_runs.

@@ -1,0 +1,16 @@
+{
+  "name": "fb-ads-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Config-driven Facebook/Meta Ads agent (scaffolded from fb-ads-agent-factory). Zero dependencies.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "run": "node pipeline.mjs",
+    "dry-run": "DRY_RUN=1 node pipeline.mjs",
+    "dashboard": "node dashboard/serve.mjs",
+    "vision-qa": "node vision-qa.mjs"
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "acceptance": {
+    "goalCondition": "`node scripts/verify-agent.mjs <agent-dir> --runs runs/<client>/<stamp>` exits 0 and every configured acceptance criterion is PASS or PARKED with evidence",
+    "maxAttempts": 3,
+    "criteria": [
+      {
+        "id": "winners-conform",
+        "description": "Every row in the run's winners.json satisfies the configured Winner rule: conversions > 0 AND costPerConversion <= thresholds.target_cpa. A term that did not earn its way in is not a winner.",
+        "verification": "node scripts/verify-agent.mjs <agent-dir> --runs runs/<client>/<stamp> -> acceptance:winners-conform PASS",
+        "verifier": "code",
+        "negativeCase": "fixtures/runs-bad/2026-07-12T09-00-00-000Z/winners.json carries a row at costPerConversion 213.5 (> target_cpa 75) -> FAIL",
+        "params": {
+          "tolerance": 1
+        }
+      },
+      {
+        "id": "waste-conform",
+        "description": "Every row in the run's waste.json satisfies the configured waste rule: conversions absent-or-0 AND cost > thresholds.waste_min_spend. Nothing gets negated for spending less than the floor.",
+        "verification": "node scripts/verify-agent.mjs <agent-dir> --runs runs/<client>/<stamp> -> acceptance:waste-conform PASS",
+        "verifier": "code",
+        "negativeCase": "fixtures/runs-bad/2026-07-12T09-00-00-000Z/waste.json carries a row at cost 4.2 (<= waste_min_spend 10) -> FAIL"
+      },
+      {
+        "id": "cost-arithmetic",
+        "description": "Every converting winner reconciles: costPerConversion equals cost / conversions within the configured envelope. Catches a fabricated cost figure that no GAQL row backs.",
+        "verification": "node scripts/verify-agent.mjs <agent-dir> --runs runs/<client>/<stamp> -> acceptance:cost-arithmetic PASS",
+        "verifier": "code",
+        "negativeCase": "fixtures/runs-bad/2026-07-12T09-00-00-000Z/winners.json claims costPerConversion 12 on cost 180 / 3 conversions (= 60) -> FAIL",
+        "params": {
+          "tolerance": 0.01,
+          "relativeTolerance": 0.01
+        }
+      },
+      {
+        "id": "no-unapproved-apply",
+        "description": "summary.json's promotionsApplied / wasteApplied / pruneApplied are all false unless a non-empty human approval artifact (approved-promotions.json / approved-waste-negatives.json) exists in the same run. No write without a human behind it.",
+        "verification": "node scripts/verify-agent.mjs <agent-dir> --runs runs/<client>/<stamp> -> acceptance:no-unapproved-apply PASS",
+        "verifier": "code",
+        "negativeCase": "fixtures/runs-bad/2026-07-12T09-00-00-000Z/summary.json sets promotionsApplied+wasteApplied true with no approval files in the run -> FAIL"
+      },
+      {
+        "id": "run-not-empty-lie",
+        "description": "summary.json cannot claim numbers its own artifacts do not back: winnersFound === winners.json row count and wasteTermsFound === waste.json row count.",
+        "verification": "node scripts/verify-agent.mjs <agent-dir> --runs runs/<client>/<stamp> -> acceptance:run-not-empty-lie PASS",
+        "verifier": "code",
+        "negativeCase": "fixtures/runs-bad/2026-07-12T09-00-00-000Z/summary.json reports winnersFound 2 while winners.json holds 3 rows -> FAIL"
+      },
+      {
+        "id": "prune-conform",
+        "description": "The Conduit lesson (FDE-303), enforced in code: every NEGATE decision in prune.json has conversions 0 (unless prune_hard_cpa_cap re-exposes a runaway converter), spend >= thresholds.prune_min_spend, is never the ad group's target keyword, and the total NEGATE count is <= thresholds.max_negatives_per_run. Every decision carries a reason code. A prune.json without per-term decisions cannot prove the guards ran and FAILS.",
+        "verification": "node scripts/verify-agent.mjs <agent-dir> --runs runs/<client>/<stamp> -> acceptance:prune-conform PASS",
+        "verifier": "code",
+        "negativeCase": "fixtures/runs-bad/2026-07-12T09-00-00-000Z/prune.json NEGATEs 'hvac financing for contractors' with 3 conversions and spend 2.1 (< prune_min_spend 10) — the exact shape that strangled Conduit's delivery -> FAIL"
+      },
+      {
+        "id": "winners-review",
+        "description": "A human confirms the discovered winner search terms are on-brand and worth promoting BEFORE any promotion is applied.",
+        "verification": "Reviewer signs off runs/<client>/<stamp>/winners.json; approved rows are handed back as --approved-winners and recorded in approved-promotions.json.",
+        "verifier": "human",
+        "gate": "reviewer"
+      },
+      {
+        "id": "negatives-review",
+        "description": "A human confirms the proposed waste negatives will not block legitimate traffic BEFORE they are added to the Testing campaign.",
+        "verification": "Reviewer signs off runs/<client>/<stamp>/waste.json; approved terms are handed back as --approved-waste-terms and recorded in approved-waste-negatives.json.",
+        "verifier": "human",
+        "gate": "reviewer"
+      }
+    ]
+  },
+  "client_key": "solutionwhere",
+  "display_name": "Solutionwhere",
+  "google_ads": {
+    "customer_id": "202-304-8623",
+    "login_customer_id": "5538233519"
+  },
+  "campaigns": {
+    "testing_campaign_name": "graphed_testing",
+    "winners_campaign_name": "graphed_winners",
+    "testing_campaign_id": "TESTING_CAMPAIGN_ID",
+    "testing_ad_group_id": "TESTING_AD_GROUP_ID",
+    "winners_campaign_id": "WINNERS_CAMPAIGN_ID"
+  },
+  "thresholds": {
+    "target_cpa": 500,
+    "waste_min_spend": 25,
+    "lookback_days": 30,
+    "prune_min_spend": 10,
+    "prune_require_zero_conversions": true,
+    "max_negatives_per_run": 25,
+    "prune_hard_cpa_cap": null
+  },
+  "promotion": {
+    "landing_page_url": "https://home.solutionwhere.com/professional-development",
+    "brand_headline": "Solutionwhere",
+    "descriptions": [
+      "Registration, approvals, credits and transcripts in one place. Built for education agencies.",
+      "Thirty years serving districts and regional agencies. No acquisitions, no forced migrations."
+    ]
+  },
+  "safety": {
+    "default_validate_only": true,
+    "require_apply_flag": true
+  },
+  "seeds": {
+    "broad": [
+      "professional development software for school districts",
+      "school enrollment software for districts"
+    ],
+    "phrase": [
+      "school registration software",
+      "student enrollment management system",
+      "enrollment management system",
+      "online student registration",
+      "school enrollment software",
+      "online school registration software",
+      "k 12 online registration",
+      "student registration system",
+      "school choice lottery",
+      "charter school lottery software",
+      "school lottery software",
+      "professional development management software",
+      "professional development software for schools",
+      "pd registration system for schools",
+      "professional development tracking software",
+      "teacher recertification tracking software",
+      "professional development tracker",
+      "mentoring tracking system",
+      "teacher mentoring software",
+      "teacher induction software",
+      "instructional coaching software",
+      "coaching log software",
+      "walkthrough app",
+      "classroom walkthrough software",
+      "teacher observation tool"
+    ],
+    "negatives": [
+      "daycare",
+      "day care",
+      "near me",
+      "babysitter",
+      "nanny",
+      "tuition",
+      "parent portal",
+      "enroll my child",
+      "jobs",
+      "job",
+      "careers",
+      "salary",
+      "resume",
+      "substitute teacher",
+      "how to become",
+      "free",
+      "webinar",
+      "lms",
+      "learning management system",
+      "canvas",
+      "schoology",
+      "google classroom",
+      "payroll",
+      "gradebook",
+      "student information system",
+      "sis",
+      "iep software",
+      "crm",
+      "erp",
+      "church",
+      "gym",
+      "university",
+      "college",
+      "higher education",
+      "admissions crm",
+      "corporate training",
+      "employee training",
+      "brightwheel",
+      "procare",
+      "daycare management software",
+      "preschool management software",
+      "login",
+      "log in",
+      "sign in",
+      "password",
+      "app",
+      "download",
+      "support",
+      "help",
+      "tutorial"
+    ]
+  },
+  "bootstrap": {
+    "daily_budget": 15,
+    "bidding": "MAXIMIZE_CLICKS"
+  },
+  "dashboard": {
+    "title": "Solutionwhere Google Ads",
+    "brand": {
+      "initials": "SW",
+      "primary": "#1b2a4a",
+      "accent": "#2c6e49"
+    }
+  }
+}

@@ -1,0 +1,371 @@
+{
+  "version": 1,
+  "$comment": "Deterministic intake -> client.config.json mapping for fb-ads-agent. The /create-fb-ads-agent skill collects the Tier-1/Tier-2 intake into a FLAT answers.json ({ \"<entry-id>\": <value> }); scripts/build-config.mjs maps those answers through these entries into the nested config, fail-closed (unknown answer / missing required / bad type => exit 1). The LLM transcribes flat values only; it NEVER hand-writes the nested config JSON. answers.json is retained in the agent dir as the audit artifact, and verify-acceptance.mjs rebuilds config.acceptance from it: criteria are read-only to the executing agent, changing one means a human re-runs intake.",
+  "entries": [
+    {
+      "id": "client-name",
+      "question": "TIER 1 - Client display name?",
+      "path": "client.name",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "client-slug",
+      "question": "TIER 2 - Folder slug (lowercase, a-z0-9-)? Blank = derive from the name.",
+      "path": "client.slug",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "landing-page",
+      "question": "TIER 1 - Landing page: the real destination URL for every ad (never a homepage guess).",
+      "path": "client.landing_page",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "geo",
+      "question": "TIER 2 - Country codes to target (comma-separated). Default US-only.",
+      "path": "client.geo",
+      "type": "list",
+      "required": false,
+      "default": "US"
+    },
+    {
+      "id": "ad-account-id",
+      "question": "TIER 1 - Meta ad account id (act_<number>).",
+      "path": "meta_ads.ad_account_id",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "page-id",
+      "question": "TIER 1 - Facebook page id the ads run under.",
+      "path": "meta_ads.page_id",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "instagram-id",
+      "question": "TIER 2 - Instagram actor id (optional; IG placements). Blank = omit.",
+      "path": "meta_ads.instagram_id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "access-token-env",
+      "question": "TIER 1 - Env NAME holding the Meta token (value never in config).",
+      "path": "meta_ads.access_token_env",
+      "type": "string",
+      "required": false,
+      "default": "FB_ACCESS_TOKEN"
+    },
+    {
+      "id": "adset-static",
+      "question": "TIER 1 - Testing ad set id for IMAGE ads.",
+      "path": "meta_ads.adsets.static",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "adset-video",
+      "question": "TIER 1 (only if running video) - Testing ad set id for VIDEO ads.",
+      "path": "meta_ads.adsets.video",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "campaign-testing",
+      "question": "TIER 1 - Testing campaign id (new creative lands here PAUSED).",
+      "path": "meta_ads.campaigns.testing",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "campaign-winners",
+      "question": "TIER 1 - Winners campaign id (CBO).",
+      "path": "meta_ads.campaigns.winners",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "conversion-action-type",
+      "question": "TIER 1 - Conversion action type used to count leads (offsite_conversion.custom.<id> or lead).",
+      "path": "meta_ads.conversion_action_type",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "segments",
+      "question": "STRUCTURE - Multi-audience? JSON array of segments [{name, landing_page, adsets:{static,video}, campaigns:{testing,winners}}]. Blank = single segment (the default).",
+      "path": "meta_ads.segments",
+      "type": "json",
+      "required": false
+    },
+    {
+      "id": "statics-per-day",
+      "question": "TIER 2 - Image creatives per day (default 10).",
+      "path": "creative.statics_per_day",
+      "type": "number",
+      "required": false,
+      "default": 10
+    },
+    {
+      "id": "videos-per-day",
+      "question": "TIER 2 - Video creatives per day (default 5 if running video, else 0).",
+      "path": "creative.videos_per_day",
+      "type": "number",
+      "required": false,
+      "default": 0
+    },
+    {
+      "id": "image-model",
+      "question": "TIER 2 - Image generation model.",
+      "path": "creative.image_model",
+      "type": "string",
+      "required": false,
+      "default": "google/gemini-3.1-flash-image-preview"
+    },
+    {
+      "id": "video-model",
+      "question": "TIER 2 - Video generation model (REQUIRED by the schema if videos_per_day >= 1).",
+      "path": "creative.video_model",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "utm-template",
+      "question": "TIER 2 - url_tags template for creatives.",
+      "path": "creative.utm_template",
+      "type": "string",
+      "required": false,
+      "default": "utm_content={{ad.id}}&ad_id={{ad.id}}&adset_id={{adset.id}}&campaign_id={{campaign.id}}"
+    },
+    {
+      "id": "formats",
+      "question": "TIER 2 (you draft from the landing page) - Creative layout/vibe tags as JSON: [{tag, media_type, rules[], persona_key?, insight_key?, fixed_prompt?, segment?}].",
+      "path": "creative.formats",
+      "type": "json",
+      "required": true
+    },
+    {
+      "id": "personas",
+      "question": "TIER 2 (you draft) - Audience axis as JSON: [{key, descriptor}].",
+      "path": "creative.personas",
+      "type": "json",
+      "required": true
+    },
+    {
+      "id": "insights",
+      "question": "TIER 2 (you draft) - Message/pain-point axis as JSON: [{key, pain_point}].",
+      "path": "creative.insights",
+      "type": "json",
+      "required": true
+    },
+    {
+      "id": "brand-mission",
+      "question": "TIER 2 (you draft from the page's value prop) - Brand mission, one line.",
+      "path": "brand.mission",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "brand-audience",
+      "question": "TIER 2 (you draft) - Who the brand sells to.",
+      "path": "brand.audience",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "brand-tone",
+      "question": "TIER 2 (you draft) - Brand tone of voice.",
+      "path": "brand.tone",
+      "type": "string",
+      "required": true
+    },
+    {
+      "id": "brand-message-pillars",
+      "question": "TIER 2 (you draft) - Message pillars, comma-separated.",
+      "path": "brand.message_pillars",
+      "type": "list",
+      "required": false
+    },
+    {
+      "id": "brand-generation-rules",
+      "question": "TIER 2 - Generation rules (logo policy, stock-photo policy, ...), comma-separated. Verify checks that at least one exists.",
+      "path": "brand.generation_rules",
+      "type": "list",
+      "required": false,
+      "default": "Do not include any logos or brand marks in the image"
+    },
+    {
+      "id": "brand-confidential-name",
+      "question": "TIER 2 - Never render or mention the brand name in ad copy/images? (yes/no)",
+      "path": "brand.confidential_name",
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    {
+      "id": "target-cpl",
+      "question": "TIER 1 - Target cost per lead (the kill/promote pivot).",
+      "path": "optimization.target_cpl",
+      "type": "number",
+      "required": true
+    },
+    {
+      "id": "window-days",
+      "question": "TIER 2 - Optimizer lookback window in days (default 14).",
+      "path": "optimization.window_days",
+      "type": "number",
+      "required": false,
+      "default": 14
+    },
+    {
+      "id": "min-age-hours",
+      "question": "TIER 2 - Minimum ad age before it can be judged (default 36).",
+      "path": "optimization.min_age_hours",
+      "type": "number",
+      "required": false,
+      "default": 36
+    },
+    {
+      "id": "min-spend-to-judge",
+      "question": "TIER 2 - Minimum spend before an ad can be judged (default 35).",
+      "path": "optimization.min_spend_to_judge",
+      "type": "number",
+      "required": false,
+      "default": 35
+    },
+    {
+      "id": "zero-conv-kill-multiple",
+      "question": "TIER 2 - Kill a zero-conversion ad after spend > this x target_cpl (default 1.5).",
+      "path": "optimization.zero_conv_kill_multiple",
+      "type": "number",
+      "required": false,
+      "default": 1.5
+    },
+    {
+      "id": "cpl-kill-multiple",
+      "question": "TIER 2 - Kill an ad whose CPL exceeds this x target_cpl (default 1.5).",
+      "path": "optimization.cpl_kill_multiple",
+      "type": "number",
+      "required": false,
+      "default": 1.5
+    },
+    {
+      "id": "conversion-recency-days",
+      "question": "TIER 2 - Keep any ad with a conversion within this many days (house standard, default 3).",
+      "path": "optimization.conversion_recency_days",
+      "type": "number",
+      "required": false,
+      "default": 3
+    },
+    {
+      "id": "hard-cpa-cap",
+      "question": "TIER 1 - Hard CPA cap: ABSOLUTE cost-per-conversion ceiling that kills an ad regardless of recent conversions (the runaway-spend guard). Ask the client's real number; leave empty to disable.",
+      "path": "optimization.hard_cpa_cap",
+      "type": "number",
+      "required": false,
+      "default": null
+    },
+    {
+      "id": "kill-action",
+      "question": "TIER 2 - Kill action: PAUSE (default) or DELETE. Paused ads still count toward Meta's ad-per-ad-set cap; pick DELETE when the testing ad set is capacity-blocked (deleted ads are auto-archived, reporting kept).",
+      "path": "optimization.kill_action",
+      "type": "string",
+      "required": false,
+      "default": "PAUSE"
+    },
+    {
+      "id": "enable-ctr-rule",
+      "question": "TIER 2 - Enable the CTR floor rule (zero-conversion tiebreaker only)? (yes/no, default yes)",
+      "path": "optimization.enable_ctr_rule",
+      "type": "boolean",
+      "required": false,
+      "default": true
+    },
+    {
+      "id": "min-ctr",
+      "question": "TIER 2 - CTR floor (default 0.01 = 1%).",
+      "path": "optimization.min_ctr",
+      "type": "number",
+      "required": false,
+      "default": 0.01
+    },
+    {
+      "id": "max-pauses-per-run",
+      "question": "TIER 2 - Cap on pauses per run (default 15).",
+      "path": "optimization.max_pauses_per_run",
+      "type": "number",
+      "required": false,
+      "default": 15
+    },
+    {
+      "id": "max-promotions-per-run",
+      "question": "TIER 2 - Cap on promotions per run (default 10).",
+      "path": "optimization.max_promotions_per_run",
+      "type": "number",
+      "required": false,
+      "default": 10
+    },
+    {
+      "id": "promote-on-first-conversion",
+      "question": "STRUCTURE - Promote a testing ad on its FIRST conversion (high-volume accounts)? (yes/no, default no = normal testing/winners flow.)",
+      "path": "optimization.promote_on_first_conversion",
+      "type": "boolean",
+      "required": false
+    },
+    {
+      "id": "dashboard-title",
+      "question": "TIER 2 - Dashboard page title (default '<client name> - Meta Ads').",
+      "path": "dashboard.title",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "dashboard-initials",
+      "question": "TIER 2 - Dashboard logo-badge initials (default: first letters of the client name).",
+      "path": "dashboard.brand.initials",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "dashboard-primary",
+      "question": "TIER 2 - Dashboard primary brand color (#rrggbb).",
+      "path": "dashboard.brand.primary",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "dashboard-accent",
+      "question": "TIER 2 - Dashboard accent brand color (#rrggbb).",
+      "path": "dashboard.brand.accent",
+      "type": "string",
+      "required": false
+    },
+    {
+      "id": "goal-condition",
+      "question": "ACCEPTANCE - What condition must become true for this agent to be done? (default: verify exits 0, every code criterion PASS, every human criterion PARKED with evidence.)",
+      "path": "acceptance.goalCondition",
+      "type": "string",
+      "required": true,
+      "default": "`node factory.mjs verify <agent-dir>` exits 0: every code acceptance criterion is PASS against the run's own artifacts (paused-publish, batch-volume, destination-clean, copy-unique, not-blocked) and every human criterion is PARKED at its named gate with a signed-off review artifact. A blocked run (pipeline exit 2, report.json blocked=true) is never done."
+    },
+    {
+      "id": "max-attempts",
+      "question": "ACCEPTANCE - How many fix->verify attempts before the goal loop stops and reports FAIL? (default 3)",
+      "path": "acceptance.maxAttempts",
+      "type": "number",
+      "required": false,
+      "default": 3
+    },
+    {
+      "id": "acceptance-criteria",
+      "question": "ACCEPTANCE - The criteria array as JSON. Start from the vertical default set (paused-publish, batch-volume, destination-clean, copy-unique, not-blocked as verifier:'code'; creative-review gate:'reviewer' and vision-qa gate:'vision-qa' as verifier:'human') in client.config.example.json and edit with the operator. Every code criterion needs a registered check in scripts/verify-acceptance.registry.mjs (unknown ids FAIL closed) and a negativeCase. A human criterion is PARKED, never self-graded.",
+      "path": "acceptance.criteria",
+      "type": "json",
+      "required": true
+    }
+  ]
+}

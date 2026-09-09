@@ -1,0 +1,50 @@
+[
+  {
+    "creative_id": "northwind-dry-run-friday_night_94_calls",
+    "variation_name": "friday_night_94_calls",
+    "media_type": "image",
+    "local_path": "fixtures/assets/friday_night_94_calls.png",
+    "poster_path": null,
+    "format": "imessage_screenshot",
+    "persona_key": "overwhelmed_operator",
+    "insight_key": "fear_of_missing_calls",
+    "prompt": "Flat iMessage screen-grab: 94 missed calls on a Friday night. No phone bezel.",
+    "ad_copy": "94 calls on a Friday night. How many did you answer?",
+    "destination_link": "https://home.solutionwhere.com/professional-development",
+    "status": "paused",
+    "vision_review": {
+      "status": "passed",
+      "model": "google/gemini-2.5-flash",
+      "attempts": 1,
+      "issues": []
+    },
+    "human_review": {
+      "status": "approved",
+      "reviewed_at": "2026-06-01"
+    }
+  },
+  {
+    "creative_id": "northwind-dry-run-owner_ugc_less_admin",
+    "variation_name": "owner_ugc_less_admin",
+    "media_type": "video",
+    "local_path": "fixtures/assets/owner_ugc_less_admin.mp4",
+    "poster_path": "fixtures/assets/owner_ugc_less_admin_poster.png",
+    "format": "ugc_selfie",
+    "persona_key": "growth_minded_gm",
+    "insight_key": "admin_drag",
+    "prompt": "Handheld UGC selfie: owner talks about cutting admin time. Pain point in first 2 seconds.",
+    "ad_copy": "I got 6 hours a week back. Here's how we stopped drowning in admin.",
+    "destination_link": "https://home.solutionwhere.com/professional-development",
+    "status": "paused",
+    "vision_review": {
+      "status": "passed",
+      "model": "google/gemini-2.5-flash",
+      "attempts": 1,
+      "issues": []
+    },
+    "human_review": {
+      "status": "approved",
+      "reviewed_at": "2026-06-01"
+    }
+  }
+]

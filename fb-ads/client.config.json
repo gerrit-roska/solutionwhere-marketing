@@ -1,0 +1,219 @@
+{
+  "acceptance": {
+    "goalCondition": "`node factory.mjs verify <agent-dir>` exits 0: every code acceptance criterion is PASS against the run's own artifacts (paused-publish, batch-volume, destination-clean, copy-unique, not-blocked) and every human criterion is PARKED at its named gate with a signed-off review artifact. A blocked run (pipeline exit 2, report.json blocked=true) is never done.",
+    "maxAttempts": 3,
+    "criteria": [
+      {
+        "id": "paused-publish",
+        "description": "Every ad in the batch is created PAUSED. Nothing the agent writes can spend on its own.",
+        "verification": "code: every <creative_id>/publish.json payload.ad.fields.status === 'PAUSED' AND report.json.all_paused === true.",
+        "verifier": "code",
+        "negativeCase": "A payload whose ad.fields.status is 'ACTIVE' (or a report with all_paused=false) FAILS the check."
+      },
+      {
+        "id": "batch-volume",
+        "description": "The batch published the agreed number of creatives (nothing silently dropped).",
+        "verification": "code: count of non-skipped creatives in database.json === params.expected, else creative.statics_per_day + creative.videos_per_day. params.expected=2 pins the DRY_RUN fixture batch (fixtures/creatives.json), which is fixture-driven, not generated, because pipeline.mjs's live creative generation is not wired yet. DELETE params.expected once it is, so the check grades against the real configured daily cap.",
+        "verifier": "code",
+        "params": {
+          "expected": 2
+        },
+        "negativeCase": "A database.json with fewer (or more) non-skipped creatives than expected FAILS."
+      },
+      {
+        "id": "destination-clean",
+        "description": "Every ad points at the real configured landing page: no empty link, no TODO, no example.com, no foreign host.",
+        "verification": "code: every database.json creatives[].destination_link is non-empty, free of 'TODO'/'example.com', and its host is one of the configured landing hosts.",
+        "verifier": "code",
+        "negativeCase": "A creative with destination_link 'https://example.com/TODO' FAILS (test/acceptance.test.mjs)."
+      },
+      {
+        "id": "copy-unique",
+        "description": "No two creatives in the batch ship identical ad copy (the classic same-prompt-N-renders generator failure).",
+        "verification": "code: the object_story_spec message in each <creative_id>/publish.json payload is distinct across the batch.",
+        "verifier": "code",
+        "negativeCase": "Two creatives whose payload message strings are identical FAIL."
+      },
+      {
+        "id": "not-blocked",
+        "description": "The run actually published something: a batch where every creative was held at the human_review gate is BLOCKED, not done.",
+        "verification": "code: report.json.blocked !== true (pipeline.mjs exits 2 on a fully-blocked run).",
+        "verifier": "code",
+        "negativeCase": "A fixture batch with no creative approved -> report.blocked=true, pipeline exit 2, criterion FAILS."
+      },
+      {
+        "id": "creative-review",
+        "description": "A human reviewer signed off the creative batch: on-brand, on-persona, on-message, and safe to spend behind.",
+        "verification": "human gate 'reviewer' (Shot B): the reviewer approves the batch against creatives/<date>/database.json + the rendered assets, and sets human_review.status='approved' per creative. Never self-graded by the agent that generated the creative.",
+        "verifier": "human",
+        "gate": "reviewer"
+      },
+      {
+        "id": "vision-qa",
+        "description": "Each rendered creative passed vision QA against the brand rubric (layout rules, no rendering artifacts, no banned marks).",
+        "verification": "External verifier: vision-qa.mjs sends each rendered image + the config.brand rubric to a vision model (default claude-opus-4-8; env ANTHROPIC_API_KEY) and writes <runDir>/<creative_id>/vision-review.json with provenance (model, gradedAt, imageSha256). The registered 'vision-qa' check grades ONLY those artifacts: status must be 'passed' AND the imageSha256 must re-hash to the image on disk. Verdicts without provenance (the fixture-constant pattern) FAIL. With no artifacts yet the check reports PENDING, never PASS - live creative generation is still unwired.",
+        "verifier": "external",
+        "negativeCase": "test/vision-qa.test.mjs: a 'failed' verdict FAILS; a 'passed' verdict missing model/gradedAt/imageSha256 FAILS (fixture-constant); a verdict whose imageSha256 does not match the image on disk FAILS."
+      }
+    ]
+  },
+  "client": {
+    "name": "Solutionwhere",
+    "slug": "solutionwhere",
+    "landing_page": "https://home.solutionwhere.com/professional-development",
+    "geo": [
+      "US"
+    ]
+  },
+  "meta_ads": {
+    "platform": "meta",
+    "ad_account_id": "act_000000000000000",
+    "page_id": "000000000000000",
+    "instagram_id": "000000000000000",
+    "access_token_env": "FB_ACCESS_TOKEN",
+    "adsets": {
+      "static": "000000000000000",
+      "video": "000000000000000"
+    },
+    "campaigns": {
+      "testing": "000000000000000",
+      "winners": "000000000000000"
+    },
+    "conversion_action_type": "offsite_conversion.fb_pixel_lead"
+  },
+  "creative": {
+    "statics_per_day": 10,
+    "videos_per_day": 5,
+    "image_model": "google/gemini-3.1-flash-image-preview",
+    "video_model": "x-ai/grok-imagine-video",
+    "utm_template": "utm_source=facebook&utm_medium=paid_social&utm_content={{ad.id}}&ad_id={{ad.id}}&adset_id={{adset.id}}&campaign_id={{campaign.id}}",
+    "formats": [
+      {
+        "tag": "product_screenshot",
+        "media_type": "image",
+        "rules": [
+          "Real product UI screenshot with one bold headline; no stock photography",
+          "Flat, institutional, credible; no gradients or startup gloss"
+        ]
+      },
+      {
+        "tag": "plain_text_quote",
+        "media_type": "image",
+        "rules": [
+          "Plain background, one verbatim-style buyer quote in large type",
+          "Reads like an internal district email, not an ad"
+        ]
+      },
+      {
+        "tag": "talking_head_ugc",
+        "media_type": "video",
+        "rules": [
+          "30-second talking-head; hook in first 3 seconds; one CTA",
+          "Speaker persona matches the buyer, not a young influencer"
+        ]
+      }
+    ],
+    "personas": [
+      {
+        "key": "pd_director",
+        "descriptor": "Director of Professional Learning at a district or ESA running registration season on spreadsheets and a Google Form; the state recertification report takes a week"
+      },
+      {
+        "key": "registrar",
+        "descriptor": "Registrar / Director of Student Services with paper packets in a filing cabinet and a school-choice lottery someone runs in Excel and defends to the board"
+      },
+      {
+        "key": "coaching_coordinator",
+        "descriptor": "Curriculum & Instruction Director who cannot prove the coaching investment produced anything; coaches log in shared drives"
+      },
+      {
+        "key": "ccrr_director",
+        "descriptor": "CCR&R Executive Director running intake, provider lists, referral history, and state reporting across four disconnected systems"
+      },
+      {
+        "key": "superintendent_gate",
+        "descriptor": "Superintendent / Executive Director who asks about outcomes, security, and FERPA, not features; has never heard of us"
+      },
+      {
+        "key": "coursewhere_admin",
+        "descriptor": "Administrator on CourseWhere or an old Wisdomwhere since 2009; nobody left knows how it works; terrified of a migration disaster"
+      }
+    ],
+    "insights": [
+      {
+        "key": "time_cost",
+        "pain_point": "Registration season costs the team six weeks of manual admin"
+      },
+      {
+        "key": "compliance_audit",
+        "pain_point": "When the state asks for Act 48 / SCECH / CTLE hours, the answer is a week-long project instead of a button"
+      },
+      {
+        "key": "peer_proof",
+        "pain_point": "Agencies buy what a named peer agency in their state already runs"
+      },
+      {
+        "key": "independence",
+        "pain_point": "Burned by acquisitions and forced migrations; Frontline bought MyLearningPlan, Pearson sunset Schoolnet"
+      },
+      {
+        "key": "buy_one_module",
+        "pain_point": "No budget for a platform commitment; need one problem solved by August"
+      },
+      {
+        "key": "real_support",
+        "pain_point": "Enterprise vendors are a ticket queue; a published phone number a certified human answers is the pitch"
+      },
+      {
+        "key": "migration_path",
+        "pain_point": "Getting off an aging system without breaking thirty years of records"
+      },
+      {
+        "key": "defensible_lottery",
+        "pain_point": "The school-choice lottery must be re-runnable with the same result in front of the board"
+      }
+    ]
+  },
+  "brand": {
+    "mission": "Four things education agencies do every year. One platform that does them.",
+    "audience": "Directors of professional learning, registrars, coaching coordinators, and CCR&R directors at US public education agencies (districts, ISDs, IUs, ESCs, BOCES, CCR&Rs)",
+    "tone": "Plain, specific, institutional. Short sentences. No hype, no feature lists, no exclamation marks.",
+    "message_pillars": [
+      "Independent since 1996 - never acquired, no forced migrations",
+      "Buy one module, not a suite",
+      "A published phone number a certified specialist answers",
+      "Four adjacent problems, one login"
+    ],
+    "generation_rules": [
+      "NEVER use stock photography of children - it teaches the algorithm to find parents instead of administrators",
+      "Show the real product where possible",
+      "No two ads in a batch share a headline",
+      "No competitor trademarks in copy",
+      "No invented statistics; the only numbers allowed are: since 1996, 33+ states, 80% less registration admin time"
+    ],
+    "confidential_name": false
+  },
+  "optimization": {
+    "target_cpl": 150,
+    "window_days": 14,
+    "min_age_hours": 36,
+    "min_spend_to_judge": 35,
+    "zero_conv_kill_multiple": 2,
+    "cpl_kill_multiple": 1.5,
+    "enable_ctr_rule": true,
+    "min_ctr": 0.008,
+    "max_pauses_per_run": 15,
+    "max_promotions_per_run": 10,
+    "conversion_recency_days": 3,
+    "hard_cpa_cap": 500,
+    "kill_action": "PAUSE"
+  },
+  "dashboard": {
+    "title": "Solutionwhere - Meta Ads",
+    "brand": {
+      "initials": "SW",
+      "primary": "#1b2a4a",
+      "accent": "#2c6e49"
+    }
+  }
+}

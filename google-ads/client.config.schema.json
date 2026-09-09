@@ -1,0 +1,391 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://graphed.local/google-ads-agent/client.config.schema.json",
+  "title": "Google Ads Agent Client Config",
+  "description": "Validates client.config.json — the single per-client file that drives the config-driven Google Ads search agent. Zero per-client code lives in the shared engine; everything client-specific lives here. Secrets are NEVER stored here: auth is supplied via environment-variable NAMES only (see .env.example). Faithful to the shared google-ads-search-manager engine's GoogleAdsClientConfig, with keyword seeds and campaign-bootstrap knobs consolidated in so the whole intake is one file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "acceptance",
+    "client_key",
+    "display_name",
+    "google_ads",
+    "campaigns",
+    "thresholds",
+    "promotion",
+    "safety",
+    "seeds",
+    "bootstrap"
+  ],
+  "properties": {
+    "acceptance": {
+      "type": "object",
+      "description": "Verification-first completion criteria derived from the task brief / one-shot intake. Criteria here are the durable source of truth for what must PASS (script-verifiable) or PARK (human gate) before the agent can claim done.",
+      "additionalProperties": false,
+      "properties": {
+        "goalCondition": {
+          "type": "string",
+          "description": "Paste-ready Claude Code /goal condition for this client, e.g. require verify/engine-load to exit 0 and every configured Google Ads criterion to be PASS or PARKED with evidence."
+        },
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "description",
+              "verification"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*$"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "verification": {
+                "type": "string",
+                "minLength": 1,
+                "description": "How this criterion is checked: command, artifact path, validateOnly preflight, or named human gate."
+              },
+              "gate": {
+                "type": "string",
+                "description": "Optional human gate owner/name when the criterion cannot be fully machine-checked."
+              },
+              "verifier": {
+                "type": "string",
+                "enum": [
+                  "code",
+                  "external",
+                  "human"
+                ],
+                "description": "Who decides this criterion. code = a registered check in scripts/verify-acceptance.registry.mjs keyed by this id, graded against a runs/<client>/<stamp>/ artifact dir; external = a third-party service's verdict (here: the Google Ads API itself) read by a registered check; human = PARKED at the named gate, never self-graded by the agent that produced the artifact. Omitted: gate present => human, else code."
+              },
+              "negativeCase": {
+                "type": "string",
+                "description": "The fixture or scenario where this check correctly FAILS. A check that cannot be made to fail is not a check. Every code/external criterion in this vertical has one in template/google-ads-agent/fixtures/runs-bad/ (see test/acceptance.test.mjs); unregistered ids fail closed either way."
+              },
+              "params": {
+                "type": "object",
+                "description": "Thresholds and knobs the registered check reads. The check decides HOW, params say HOW MUCH — e.g. winners-conform reads {\"tolerance\": 1.0} as a multiplier on thresholds.target_cpa; cost-arithmetic reads {\"tolerance\": 0.01, \"relativeTolerance\": 0.01} as the reconciliation envelope."
+              }
+            }
+          }
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Bound on the fix->rerun-verify goal loop. Exhausting it is a legitimate terminal FAIL: report with evidence, never round up to done."
+        }
+      }
+    },
+    "client_key": {
+      "type": "string",
+      "pattern": "^[a-z0-9]([a-z0-9_-]*[a-z0-9])?$",
+      "description": "Slug identifying the client. MUST equal the scaffold --slug and the config filename stem. The shared engine selects a client with --client <client_key> / GOOGLE_ADS_CLIENT."
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable client / brand name, used in run logs."
+    },
+    "google_ads": {
+      "type": "object",
+      "description": "The Google Ads accounts this agent operates on. IDs live here (not secret); auth lives in env NAMES only.",
+      "additionalProperties": false,
+      "required": [
+        "customer_id",
+        "login_customer_id"
+      ],
+      "properties": {
+        "customer_id": {
+          "type": "string",
+          "pattern": "^[0-9-]{6,}$",
+          "description": "The client Google Ads account being managed (the customer id). Digits, dashes allowed and stripped at runtime. Copied into env GOOGLE_ADS_CUSTOMER_ID by the engine."
+        },
+        "login_customer_id": {
+          "type": "string",
+          "pattern": "^[0-9-]{6,}$",
+          "description": "The MCC / manager account used as the login-customer-id header. Graphed's MCC is 5538233519. Copied into env GOOGLE_ADS_LOGIN_CUSTOMER_ID by the engine."
+        }
+      }
+    },
+    "campaigns": {
+      "type": "object",
+      "description": "The Testing (broad-match discovery) and Winners (exact-match proven) campaigns. NAMES are operator-chosen and set at intake; the three *_id fields are placeholders until `bootstrap` creates the PAUSED campaigns and writes the real numeric ids back here (assertCampaignsBootstrapped refuses the daily loop until they are numeric).",
+      "additionalProperties": false,
+      "required": [
+        "testing_campaign_name",
+        "winners_campaign_name"
+      ],
+      "properties": {
+        "testing_campaign_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Name of the broad-match discovery campaign. Used in GAQL WHERE campaign.name filters. Convention: graphed_testing."
+        },
+        "winners_campaign_name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Name of the exact-match Winners campaign (one EXACT ad group per proven winner). Convention: graphed_winners."
+        },
+        "testing_campaign_id": {
+          "type": "string",
+          "minLength": 1,
+          "default": "TESTING_CAMPAIGN_ID",
+          "description": "Numeric id of the Testing campaign. Placeholder until bootstrap writes it back."
+        },
+        "testing_ad_group_id": {
+          "type": "string",
+          "minLength": 1,
+          "default": "TESTING_AD_GROUP_ID",
+          "description": "Numeric id of the seed ad group inside Testing where seed keywords are added. Placeholder until bootstrap writes it back."
+        },
+        "winners_campaign_id": {
+          "type": "string",
+          "minLength": 1,
+          "default": "WINNERS_CAMPAIGN_ID",
+          "description": "Numeric id of the Winners campaign. Placeholder until bootstrap writes it back."
+        }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "description": "The operator knobs that drive the daily Testing→Winners loop.",
+      "additionalProperties": false,
+      "required": [
+        "target_cpa",
+        "waste_min_spend",
+        "lookback_days"
+      ],
+      "properties": {
+        "target_cpa": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Max cost-per-conversion (currency units) for a converting search term to count as a Winner. A term is promoted only if conversions > 0 AND costPerConversion <= target_cpa."
+        },
+        "waste_min_spend": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Min spend (currency units) at zero conversions before a search term is flagged waste and negative-matched."
+        },
+        "lookback_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 365,
+          "description": "GAQL lookback window (DURING LAST_<n>_DAYS) for winners, waste, and prune."
+        },
+        "prune_min_spend": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Winners-prune spend floor (currency units): never negate a served term below this spend (default 10). Mirrors waste_min_spend — the missing floor on the prune side is what strangled Conduit's delivery (FDE-303)."
+        },
+        "prune_require_zero_conversions": {
+          "type": "boolean",
+          "description": "Never negate a served term that converted in the lookback (default true). THE guard that would have prevented the Conduit incident: negatives are subtractive filters, and negating converters kills working traffic."
+        },
+        "max_negatives_per_run": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Blast-radius cap: at most this many new negatives per prune run (default 25), highest demonstrated waste first; the excess is reported as SKIP CAPPED in prune.json, never silently dropped."
+        },
+        "prune_hard_cpa_cap": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Optional (null/absent = off): a CONVERTING term becomes negation-eligible again when its cost/conversion exceeds this absolute cap — the 7/14 runaway-spend guard translated to Google's mechanism. Leave off until Cody rules on the FB→Google mapping (FDE-303 Q3)."
+        },
+        "hard_cpa_cap": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Performance-prune: CPA above this cap marks a winner ad group for pruning (engine default 100)."
+        },
+        "conversion_window_days": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Performance-prune: recent-conversion window (engine default 3)."
+        },
+        "performance_window_days": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Performance-prune: performance evaluation window (engine default 14)."
+        },
+        "min_age_hours": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Performance-prune: minimum ad-group age before judging (engine default 36)."
+        },
+        "min_spend_to_judge": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Performance-prune: minimum spend before judging (engine default 35)."
+        },
+        "zero_conv_kill_multiple": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Performance-prune: zero-conversion kill multiple vs target (engine default 1.5)."
+        },
+        "max_prunes_per_run": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Performance-prune: cap on prunes per run (engine default 15)."
+        }
+      }
+    },
+    "promotion": {
+      "type": "object",
+      "description": "The Responsive Search Ad (RSA) content used when a Winner is promoted into its exact-match ad group.",
+      "additionalProperties": false,
+      "required": [
+        "landing_page_url",
+        "brand_headline",
+        "descriptions"
+      ],
+      "properties": {
+        "landing_page_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Final URL for the RSA created when promoting a winner."
+        },
+        "brand_headline": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Brand headline woven into the RSA (headline 3)."
+        },
+        "descriptions": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "RSA description lines (at least 2, Google requires 2+)."
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "description": "The write-safety posture. The engine's every mutation flows through one mutate(ops, validateOnly) call; these set its defaults. Campaigns are always created PAUSED regardless.",
+      "additionalProperties": false,
+      "required": [
+        "default_validate_only",
+        "require_apply_flag"
+      ],
+      "properties": {
+        "default_validate_only": {
+          "type": "boolean",
+          "default": true,
+          "description": "When true, writes default to Google Ads validateOnly (dry-run) mode unless an explicit --apply / --auto-apply flag is passed. MUST be true in the template default."
+        },
+        "require_apply_flag": {
+          "type": "boolean",
+          "default": true,
+          "description": "Records the intent that real writes require an explicit --apply flag. The actual gate is the presence of the flag; this documents the policy."
+        }
+      }
+    },
+    "seeds": {
+      "type": "object",
+      "description": "The keyword seed set the agent adds to the Testing seed ad group on `seed`. Emitted by the scaffolder to seeds.json alongside the config.",
+      "additionalProperties": false,
+      "required": [
+        "broad"
+      ],
+      "properties": {
+        "broad": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Positive keywords added to the Testing seed ad group as BROAD match (broad self-expands for discovery)."
+        },
+        "phrase": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Positive keywords added as PHRASE match. Optional."
+        },
+        "negatives": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Brand-safety BROAD campaign-level negatives on the Testing campaign. Optional."
+        }
+      }
+    },
+    "bootstrap": {
+      "type": "object",
+      "description": "Knobs used ONCE, when bootstrap creates the PAUSED Testing + Winners campaigns. Not read by the daily loop.",
+      "additionalProperties": false,
+      "required": [
+        "daily_budget",
+        "bidding"
+      ],
+      "properties": {
+        "daily_budget": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Daily budget (account currency) applied to BOTH the Testing and Winners campaign budgets at creation."
+        },
+        "bidding": {
+          "$ref": "#/$defs/biddingStrategy"
+        }
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "description": "Optional dashboard branding. report.ts embeds these tokens into dashboard/data.json; the static dashboard/index.html applies them as CSS variables. Colors default to the fleet-neutral clean white/black monochrome (#1a1a1a / #4a4a4a on white) when omitted.",
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Dashboard page title. Defaults to '<display_name> Google Ads'."
+        },
+        "brand": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "initials": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 3,
+              "description": "Logo-badge initials. Defaults to the first letters of display_name."
+            },
+            "primary": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Primary brand color (hex): headings, logo badge, stat values."
+            },
+            "accent": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Accent brand color (hex)."
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "biddingStrategy": {
+      "type": "string",
+      "enum": [
+        "MAXIMIZE_CLICKS",
+        "MAXIMIZE_CONVERSIONS"
+      ],
+      "description": "Campaign bidding strategy set at bootstrap. MAXIMIZE_CLICKS is the safe default (does not require conversion tracking to exist yet); switch to MAXIMIZE_CONVERSIONS once the account has conversion history."
+    }
+  }
+}

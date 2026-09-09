@@ -1,0 +1,99 @@
+{
+  "title": "Northwind - Meta Ads",
+  "brand": {
+    "initials": "NW",
+    "primary": "#0d1b2a",
+    "accent": "#1a5f3c"
+  },
+  "generated": "dry-run",
+  "adAccountId": "act_100000000000001",
+  "rows": [
+    {
+      "creative_id": "northwind-dry-run-friday_night_94_calls",
+      "variation_name": "friday_night_94_calls",
+      "media_type": "image",
+      "format": "imessage_screenshot",
+      "persona_key": "overwhelmed_operator",
+      "insight_key": "fear_of_missing_calls",
+      "segment": null,
+      "status": "paused",
+      "publish_status": "paused",
+      "fb_ad_id": null,
+      "destination_link": "https://northwind.example/get-started",
+      "thumbnail_url": "fixtures/assets/friday_night_94_calls.png",
+      "published_at": "dry-run"
+    },
+    {
+      "creative_id": "northwind-dry-run-owner_ugc_less_admin",
+      "variation_name": "owner_ugc_less_admin",
+      "media_type": "video",
+      "format": "ugc_selfie",
+      "persona_key": "growth_minded_gm",
+      "insight_key": "admin_drag",
+      "segment": null,
+      "status": "paused",
+      "publish_status": "paused",
+      "fb_ad_id": null,
+      "destination_link": "https://northwind.example/get-started",
+      "thumbnail_url": "fixtures/assets/owner_ugc_less_admin_poster.png",
+      "published_at": "dry-run"
+    }
+  ],
+  "insights": [
+    {
+      "ad_name": "northwind-2026-06-01-friday_night_94_calls",
+      "spend": 42,
+      "impressions": 5200,
+      "ctr": 0.016923076923076923,
+      "leads": 3,
+      "cpl": 14,
+      "decision": "SKIP",
+      "reason": "WINNER"
+    },
+    {
+      "ad_name": "northwind-2026-06-01-cold_open_zero",
+      "spend": 90,
+      "impressions": 6100,
+      "ctr": 0.006557377049180328,
+      "leads": 0,
+      "cpl": null,
+      "decision": "PAUSE",
+      "reason": "ZERO_CONV_BURN"
+    },
+    {
+      "ad_name": "northwind-2026-06-01-expensive_lead",
+      "spend": 160,
+      "impressions": 7000,
+      "ctr": 0.017142857142857144,
+      "leads": 1,
+      "cpl": 160,
+      "decision": "PAUSE",
+      "reason": "BAD_CPL"
+    },
+    {
+      "ad_name": "northwind-2026-06-01-too_young",
+      "spend": 20,
+      "impressions": 900,
+      "ctr": 0.013333333333333334,
+      "leads": 0,
+      "cpl": null,
+      "decision": "SKIP",
+      "reason": "GRACE_PERIOD"
+    },
+    {
+      "ad_name": "northwind-2026-06-01-not_ours",
+      "spend": 500,
+      "impressions": 100,
+      "ctr": 0,
+      "leads": 0,
+      "cpl": null,
+      "decision": "SKIP",
+      "reason": "NOT_TESTING"
+    }
+  ],
+  "optimization": {
+    "pauses": 2,
+    "promotions": 1,
+    "evaluated": 5
+  }
+}

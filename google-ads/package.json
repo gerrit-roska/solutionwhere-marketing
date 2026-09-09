@@ -1,0 +1,29 @@
+{
+  "name": "google-ads-search-manager",
+  "version": "0.2.0",
+  "description": "Testing -> Winners search-campaign automation loop for the Google Ads REST API (v24), with service-account auth.",
+  "type": "commonjs",
+  "scripts": {
+    "accounts": "ts-node list_accounts.ts",
+    "bootstrap": "ts-node bootstrap_campaigns.ts",
+    "winners": "ts-node find_winners.ts",
+    "waste": "ts-node find_waste.ts",
+    "promote": "ts-node promote_winner.ts",
+    "prune": "ts-node prune_winners.ts",
+    "seed": "ts-node seed_keywords.ts",
+    "negate": "ts-node negate_testing.ts",
+    "daily": "ts-node daily.ts",
+    "typecheck": "tsc --noEmit",
+    "report": "ts-node report.ts",
+    "dashboard": "node dashboard/serve.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "google-auth-library": "^9.14.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}

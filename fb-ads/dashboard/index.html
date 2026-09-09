@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meta Ads Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      /* Brand tokens: overridden at render time from data.json (config-driven). */
+      --brand-primary: #1a1a1a;
+      --brand-accent: #4a4a4a;
+      --surface: #ffffff;
+      --text-dark: #1a1a1a;
+      --text-muted: #666;
+      --border-color: #e0e0e0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--surface);
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+    .container { max-width: 1300px; margin: 0 auto; padding: 40px 20px; }
+    header { margin-bottom: 32px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 44px; height: 44px; background: var(--brand-primary); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 18px; flex: none;
+    }
+    h1 { color: var(--brand-primary); font-size: 28px; font-weight: 600; letter-spacing: -0.5px; }
+    .subtitle { color: var(--text-muted); font-size: 15px; }
+    .last-updated { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px; margin-bottom: 32px;
+    }
+    .stat-card {
+      background: white; border-radius: 12px; padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border-color);
+    }
+    .stat-value { font-size: 30px; font-weight: 700; color: var(--brand-primary); line-height: 1.2; }
+    .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+    .card {
+      background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 24px;
+    }
+    .card-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border-color);
+      display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap;
+    }
+    .card-title { font-size: 16px; font-weight: 600; }
+    .card-note { font-size: 12px; color: var(--text-muted); }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 16px; text-align: left; vertical-align: middle; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    th {
+      background: #f5f5f5; font-weight: 600; font-size: 12px; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+    tr:not(:last-child) td { border-bottom: 1px solid var(--border-color); }
+    tr:hover td { background: #fafafa; }
+    .row-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .reason { font-size: 12px; color: var(--text-muted); max-width: 220px; white-space: normal; }
+    .pill {
+      display: inline-block; padding: 3px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 500; white-space: nowrap;
+    }
+    .pill-active { background: #e8f5e9; color: #2e7d32; }
+    .pill-paused { background: #fff3e0; color: #e65100; }
+    .pill-kill { background: #fdecea; color: #c62828; }
+    .pill-other { background: #eceff1; color: #546e7a; }
+    .thumbnail-cell { width: 96px; }
+    .thumbnail-link { display: block; cursor: pointer; }
+    .thumbnail {
+      width: 72px; height: 72px; object-fit: cover; border-radius: 8px;
+      border: 1px solid var(--border-color); transition: transform 0.15s, box-shadow 0.15s; display: block;
+    }
+    .thumbnail:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .no-image { color: var(--text-muted); font-style: italic; font-size: 12px; }
+    .local-file {
+      font-size: 11px; color: var(--text-muted); display: block; max-width: 96px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      display: inline-block; padding: 7px 12px; border-radius: 6px; font-size: 12px;
+      font-weight: 500; text-decoration: none; white-space: nowrap; transition: background 0.15s;
+    }
+    .btn-fb { background: #1877f2; color: white; }
+    .btn-fb:hover { background: #166fe5; }
+    .btn-link { background: var(--brand-primary); color: white; }
+    .btn-link:hover { background: var(--brand-accent); }
+    .empty { text-align: center; color: var(--text-muted); padding: 48px 20px; }
+    .empty strong { display: block; font-size: 16px; color: var(--text-dark); margin-bottom: 6px; }
+    .empty code {
+      background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 12px;
+    }
+    /* Lightbox */
+    .lightbox {
+      display: none; position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.9); align-items: center; justify-content: center; cursor: pointer;
+    }
+    .lightbox-content { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+    .lightbox-close {
+      position: absolute; top: 20px; right: 32px; color: white;
+      font-size: 36px; font-weight: bold; line-height: 1;
+    }
+    @media (max-width: 768px) {
+      .container { padding: 20px 14px; }
+      h1 { font-size: 22px; }
+      th, td { padding: 10px; }
+      .thumbnail-cell { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="brand-logo" id="logo"></div>
+        <div>
+          <h1 id="title">Meta Ads</h1>
+          <p class="subtitle" id="subtitle">Creative performance and daily optimizer decisions</p>
+        </div>
+      </div>
+      <p class="last-updated" id="generated"></p>
+    </header>
+    <div id="body"></div>
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <span class="lightbox-close">&times;</span>
+    <img class="lightbox-content" id="lightbox-img" alt="" />
+  </div>
+
+  <script type="module">
+    // Embed data source (docs/CONTRACTS.md section 6): read the generated
+    // dashboard/data.json. No live warehouse/API fetch on load; every number on
+    // screen comes from this one file, written by pipeline.mjs's writeDashboardData.
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const usd = (n) => n == null ? '-' : '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+    const int = (n) => n == null ? '-' : Number(n).toLocaleString('en-US');
+    const pct = (n) => n == null ? '-' : (Number(n) * 100).toFixed(2) + '%';
+    const statusPill = (s) => {
+      const cls = s === 'active' ? 'pill-active' : s === 'paused' ? 'pill-paused' : 'pill-other';
+      return `<span class="pill ${cls}">${esc(s ?? '')}</span>`;
+    };
+    // optimizer.mjs decision vocabulary (docs/CONTRACTS.md section 5b/5b-ii):
+    // PAUSE | KILL = testing/winners-campaign kills, KEEP = winners survives,
+    // SKIP = no action this run (includes promotion candidates; see `reason`).
+    const decisionPill = (d) => {
+      const cls = (d === 'PAUSE' || d === 'KILL') ? 'pill-kill' : d === 'KEEP' ? 'pill-active' : 'pill-other';
+      return d ? `<span class="pill ${cls}">${esc(d)}</span>` : '';
+    };
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    lightbox.addEventListener('click', () => { lightbox.style.display = 'none'; });
+
+    const res = await fetch('./data.json').catch(() => null);
+    const data = res && res.ok ? await res.json() : null;
+
+    const brand = data?.brand ?? {};
+    if (brand.primary) document.documentElement.style.setProperty('--brand-primary', brand.primary);
+    if (brand.accent) document.documentElement.style.setProperty('--brand-accent', brand.accent);
+    document.getElementById('logo').textContent = brand.initials ?? '';
+    document.getElementById('title').textContent = data?.title ?? 'Meta Ads';
+    document.title = data?.title ?? 'Meta Ads Dashboard';
+
+    const body = document.getElementById('body');
+    if (!data) {
+      body.innerHTML = `<div class="card"><div class="empty"><strong>No data yet</strong>
+        Run <code>DRY_RUN=1 node pipeline.mjs</code> (or a live run) to generate dashboard/data.json.</div></div>`;
+    } else {
+      document.getElementById('generated').textContent = 'Generated ' + (data.generated ?? '');
+
+      const rows = data.rows ?? [];
+      const active = rows.filter((r) => r.status === 'active').length;
+      const paused = rows.filter((r) => r.status === 'paused').length;
+      const stats = `
+        <div class="stats">
+          <div class="stat-card"><div class="stat-value">${int(rows.length)}</div><div class="stat-label">Total creatives</div></div>
+          <div class="stat-card"><div class="stat-value">${int(active)}</div><div class="stat-label">Active</div></div>
+          <div class="stat-card"><div class="stat-value">${int(paused)}</div><div class="stat-label">Paused</div></div>
+        </div>`;
+
+      const acctId = String(data.adAccountId ?? '').replace(/^act_/, '');
+      const creativeRows = rows.map((r) => {
+        const isHttpThumb = typeof r.thumbnail_url === 'string' && /^https?:\/\//.test(r.thumbnail_url);
+        const thumb = isHttpThumb
+          ? `<a href="${esc(r.thumbnail_url)}" target="_blank" rel="noopener" class="thumbnail-link" title="Click to view full size">
+               <img src="${esc(r.thumbnail_url)}" alt="${esc(r.variation_name ?? '')}" class="thumbnail" data-lightbox="${esc(r.thumbnail_url)}">
+             </a>`
+          : r.thumbnail_url
+            ? `<span class="local-file" title="${esc(r.thumbnail_url)}">${esc(r.thumbnail_url)}</span>`
+            : `<span class="no-image">no image</span>`;
+        const fbLink = (r.fb_ad_id && acctId)
+          ? `<a href="https://adsmanager.facebook.com/adsmanager/manage/ads?act=${esc(acctId)}&selected_ad_ids=${esc(r.fb_ad_id)}" target="_blank" rel="noopener" class="btn btn-fb">Facebook Ads</a>`
+          : '';
+        const lpLink = r.destination_link
+          ? `<a href="${esc(r.destination_link)}" target="_blank" rel="noopener" class="btn btn-link">Landing Page</a>`
+          : '';
+        const meta = [r.format, r.persona_key, r.insight_key].filter(Boolean).map(esc).join(' &middot; ');
+        return `<tr>
+          <td><strong>${esc(r.variation_name ?? r.creative_id ?? '')}</strong>${meta ? `<div class="row-meta">${meta}</div>` : ''}</td>
+          <td>${esc(r.published_at ?? '')}</td>
+          <td class="thumbnail-cell">${thumb}</td>
+          <td>${statusPill(r.status)}</td>
+          <td><div class="actions">${fbLink}${lpLink}</div></td>
+        </tr>`;
+      }).join('');
+      const creatives = `
+        <div class="card"><div class="card-header"><h2 class="card-title">Published Creatives</h2>
+        <span class="card-note">${int(rows.length)} creative(s)</span></div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Creative</th><th>Published</th><th>Preview</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${creativeRows || `<tr><td colspan="5" class="empty">No creatives yet - run the pipeline to generate one.</td></tr>`}</tbody>
+        </table></div></div>`;
+
+      const insightRows = (data.insights ?? []).map((r) => `
+        <tr><td><strong>${esc(r.ad_name ?? '')}</strong></td>
+        <td class="num">${usd(r.spend)}</td><td class="num">${int(r.impressions)}</td>
+        <td class="num">${pct(r.ctr)}</td><td class="num">${int(r.leads)}</td>
+        <td class="num">${r.cpl != null ? usd(r.cpl) : '-'}</td>
+        <td>${decisionPill(r.decision)}</td><td class="reason">${esc(r.reason ?? '')}</td></tr>`).join('');
+      const optNote = data.optimization
+        ? `<span class="card-note">${int(data.optimization.pauses)} pause(s), ${int(data.optimization.promotions)} promotion(s) over ${int(data.optimization.evaluated)} ad(s)</span>`
+        : '<span class="card-note">no insights this run</span>';
+      const insights = `
+        <div class="card"><div class="card-header"><h2 class="card-title">Performance (per-ad insights)</h2>${optNote}</div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Ad</th><th class="num">Spend</th><th class="num">Impressions</th>
+          <th class="num">CTR</th><th class="num">Leads</th><th class="num">CPL</th><th>Decision</th><th>Reason</th></tr></thead>
+          <tbody>${insightRows || `<tr><td colspan="8" class="empty">No insights this run</td></tr>`}</tbody>
+        </table></div></div>`;
+
+      body.innerHTML = stats + creatives + insights;
+
+      // Lightbox wiring (event delegation on freshly-rendered thumbnails; no
+      // inline onclick handlers, so no risk of tripping a JS dialog/CSP issue).
+      document.querySelectorAll('img[data-lightbox]').forEach((img) => {
+        img.addEventListener('click', (e) => {
+          e.preventDefault();
+          lightboxImg.src = img.dataset.lightbox;
+          lightboxImg.alt = img.alt;
+          lightbox.style.display = 'flex';
+        });
+      });
+    }
+  </script>
+</body>
+</html>

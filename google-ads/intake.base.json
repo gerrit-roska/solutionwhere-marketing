@@ -1,0 +1,7 @@
+{
+  "campaigns": {
+    "testing_campaign_id": "TESTING_CAMPAIGN_ID",
+    "testing_ad_group_id": "TESTING_AD_GROUP_ID",
+    "winners_campaign_id": "WINNERS_CAMPAIGN_ID"
+  }
+}
