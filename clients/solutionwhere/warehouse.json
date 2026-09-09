@@ -1,0 +1,14 @@
+{
+  "ga4": "",
+  "searchConsole": "",
+  "googleAds": "",
+  "metaAds": "",
+  "crm": "",
+  "instantly": "",
+  "demoEventName": "demo_request",
+  "notes": {
+    "fb_ads_gptex9": "DO NOT USE — George Shapiro's PERSONAL ad account, connected 2026-08-28. Replace metaAds with the schema of the Solutionwhere business ad account source once it exists (FDE-527).",
+    "googleAds": "Access granted (Customer ID 202-304-8623) but the warehouse source is not connected yet (FDE-526).",
+    "crm": "CRM undetermined — in-house per Aug 19 kickoff notes, HubSpot per spec. Resolve via FDE-528 before wiring offline conversions."
+  }
+}

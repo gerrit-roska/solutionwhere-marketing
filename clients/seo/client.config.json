@@ -1,0 +1,16 @@
+{
+  "client": {
+    "name": "Solutionwhere",
+    "siteUrl": "https://home.solutionwhere.com",
+    "brandVoice": "Plain, specific, institutional. Short sentences. Name the state system, the agency type, and the real requirement. No feature lists, no exclamation marks, no 'in today's fast-paced world'.",
+    "audience": "Directors of professional learning, curriculum directors, registrars, and early-childhood program coordinators at public school districts, regional education service agencies (ISDs, IUs, ESCs, BOCES, AEAs), and CCR&R agencies. They are compliance-driven, budget-constrained, and evaluate vendors by peer reference."
+  },
+  "content": {
+    "defaultWordCount": 1400,
+    "ctaText": "See how districts track this in Wisdomwhere",
+    "ctaUrl": "https://home.solutionwhere.com/professional-development"
+  },
+  "cms": {
+    "type": "none"
+  }
+}

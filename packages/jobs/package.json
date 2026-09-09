@@ -1,0 +1,17 @@
+{
+  "name": "@app/jobs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "job:seo-publish-daily": "tsx src/seo-publish-daily.ts",
+    "job:list-build-nightly": "tsx src/list-build-nightly.ts",
+    "job:verify-emails-daily": "tsx src/verify-emails-daily.ts",
+    "job:aeo-panel-monthly": "tsx src/aeo-panel-monthly.ts",
+    "job:rfp-watch-daily": "tsx src/rfp-watch-daily.ts",
+    "job:keyword-refresh-quarterly": "tsx src/keyword-refresh-quarterly.ts"
+  },
+  "dependencies": {
+    "@app/core": "*"
+  }
+}

@@ -1,0 +1,12 @@
+# The production image contains everything NOT listed here (the Dockerfile's
+# runner stage copies the whole build stage). Keep secret-bearing and
+# local-only files listed.
+**/node_modules
+**/.next
+dist
+.git
+# All dotenv files (.env, .env.local, .env.production, ...) stay out of
+# build context — they hold secrets and belong to the local environment.
+.env*
+.graphed
+docker-compose.yml

@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Michigan SIGMA VSS current solicitations",
+    "url": "https://sigma.michigan.gov/webapp/PRDVSS2X1/AltSelfService"
+  },
+  {
+    "name": "Pennsylvania eMarketplace solicitations",
+    "url": "https://www.emarketplace.state.pa.us/Solicitations.aspx"
+  },
+  {
+    "name": "Ohio procurement opportunities",
+    "url": "https://procure.ohio.gov/proc-opps"
+  },
+  {
+    "name": "New York State Contract Reporter",
+    "url": "https://www.nyscr.ny.gov/adsOpen.cfm"
+  },
+  {
+    "name": "Louisiana LaPAC bid listing",
+    "url": "https://wwwcfprd.doa.louisiana.gov/OSP/LaPAC/pubMain.cfm"
+  },
+  {
+    "name": "Illinois BidBuy public bids",
+    "url": "https://www.bidbuy.illinois.gov/bso/view/search/external/advancedSearchBid.xhtml"
+  },
+  {
+    "name": "Texas SmartBuy ESBD",
+    "url": "https://www.txsmartbuy.gov/esbd"
+  }
+]

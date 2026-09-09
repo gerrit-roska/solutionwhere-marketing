@@ -1,0 +1,91 @@
+slug: solutionwhere-marketing
+name: Solutionwhere Marketing
+
+# Scaffold provenance. The Graphed CLI reads this to check plugin
+# compatibility; it is stripped on deploy and never sent to the server.
+scaffold:
+  name: base
+  version: 0.1.0
+
+databases:
+  primary:
+    env: DATABASE_URL
+
+release:
+  command: npm run db:migrate
+  timeout_seconds: 600
+  retries: 1
+
+services:
+  dashboard:
+    command: node packages/dashboard/.next/standalone/packages/dashboard/server.js
+    port: 3000
+    healthcheck: /api/health
+
+# Job hygiene: every job here is intentional and production-purposed. Blocked
+# capabilities (sequencer-sync, offline-conversions, ads-guardrails, the
+# fb-* Andromeda loop) stay OUT of this manifest until their access lands —
+# no far-future-cron parking. LLM + vendor calls run through the Graphed
+# proxy/Tools; no vendor keys are declared.
+jobs:
+  # SEO kit: drafts one article per weekday into seo_articles (cms: none —
+  # zero external writes until the publishing path is approved).
+  seo-publish-daily:
+    command: npm run job:seo-publish-daily
+    schedule:
+      cron: 0 12 * * 1-5
+      timezone: America/New_York
+    retries: 0
+    timeout_seconds: 1800
+
+  # Named-account list pipeline: one source per night (NCES / AESA / staff
+  # directories), tracked in source_runs.
+  list-build-nightly:
+    command: npm run job:list-build-nightly
+    schedule:
+      cron: 0 3 * * *
+      timezone: America/New_York
+    retries: 0
+    timeout_seconds: 7200
+
+  # Million Verifier bulk verification with the 2% bounce circuit-breaker.
+  # Credits are money: retries stay 0.
+  verify-emails-daily:
+    command: npm run job:verify-emails-daily
+    schedule:
+      cron: 0 5 * * *
+      timezone: America/New_York
+    retries: 0
+    timeout_seconds: 3600
+
+  # AEO prompt panel: 20 prompts x 4 models monthly through the OpenRouter
+  # proxy; results in aeo_results, charted at /aeo.
+  aeo-panel-monthly:
+    command: npm run job:aeo-panel-monthly
+    schedule:
+      cron: 0 8 1 * *
+      timezone: America/New_York
+    retries: 1
+    timeout_seconds: 3600
+
+  # Procurement watch over curated state portals; hits go to Slack for the
+  # AE, never into a sequence.
+  # SLACK_WEBHOOK_URL is intentionally not declared yet — alerts log to
+  # stdout until a webhook for this client exists; declare + set it then.
+  rfp-watch-daily:
+    command: npm run job:rfp-watch-daily
+    schedule:
+      cron: 0 6 * * 1-5
+      timezone: America/New_York
+    retries: 1
+    timeout_seconds: 1800
+
+  # Keyword volume refresh via Graphed Tools (dataforseo live volume) +
+  # seo queue re-rank. Billed per call: retries 0.
+  keyword-refresh-quarterly:
+    command: npm run job:keyword-refresh-quarterly
+    schedule:
+      cron: 0 9 1 1,4,7,10 *
+      timezone: America/New_York
+    retries: 0
+    timeout_seconds: 1800
