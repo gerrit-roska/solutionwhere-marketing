@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import * as cheerio from "cheerio";
+import { projectRoot } from "../config";
 import { getDb } from "../db";
 import { postSlack } from "./alerts";
 
@@ -32,7 +33,7 @@ interface RfpSource {
 }
 
 function loadSources(): RfpSource[] {
-  const path = resolve(process.cwd(), "data/rfp-sources.json");
+  const path = resolve(projectRoot(), "data/rfp-sources.json");
   try {
     return JSON.parse(readFileSync(path, "utf-8")) as RfpSource[];
   } catch {

@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { projectRoot } from "../config";
 import { getDb } from "../db";
 import { graphed } from "./graphed";
 import { warehouseConfig, withSchemas, wq } from "./warehouse";
@@ -41,7 +42,7 @@ function clusterOf(keyword: string): string {
 }
 
 function loadTermList(): string[] {
-  const path = resolve(process.cwd(), "data/keyword-terms.txt");
+  const path = resolve(projectRoot(), "data/keyword-terms.txt");
   try {
     return readFileSync(path, "utf-8")
       .split("\n")
