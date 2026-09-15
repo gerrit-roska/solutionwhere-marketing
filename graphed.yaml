@@ -22,86 +22,67 @@ services:
     port: 3000
     healthcheck: /api/health
 
-# Job hygiene: every job here is intentional and production-purposed. Blocked
-# capabilities (sequencer-sync, offline-conversions, ads-guardrails, the
-# fb-* Andromeda loop) stay OUT of this manifest until their access lands —
-# no far-future-cron parking. LLM + vendor calls run through the Graphed
-# proxy/Tools; no vendor keys are declared.
+# All crons PAUSED during client onboarding (2026-09-15). Deletion is the
+# only real off switch — run one-offs with `graphed dev run -- npm run job:<name>`.
+# Re-enable blocks below once tracking + suppression list land.
 jobs:
-  # SEO drafting cron is PAUSED (removed per Gerrit, 2026-09-09) until the
-  # publishing connection/decision lands — the site is Next.js with no CMS,
-  # so drafts have nowhere to go yet. Deletion is the only real off switch;
-  # run one-offs with `graphed dev run -- npm run job:seo-publish-daily`.
-  # Re-add this block to resume:
+  # SEO drafting cron is PAUSED until the publishing connection/decision lands.
   #   seo-publish-daily:
   #     command: npm run job:seo-publish-daily
   #     schedule: { cron: 0 12 * * 1-5, timezone: America/New_York }
   #     retries: 0
   #     timeout_seconds: 1800
 
-  # Named-account list pipeline: one source per night (NCES / AESA / staff
-  # directories), tracked in source_runs.
-  list-build-nightly:
-    command: npm run job:list-build-nightly
-    schedule:
-      cron: 0 3 * * *
-      timezone: America/New_York
-    retries: 0
-    timeout_seconds: 7200
+  # Named-account list pipeline (NCES / AESA / staff directories).
+  # list-build-nightly:
+  #   command: npm run job:list-build-nightly
+  #   schedule:
+  #     cron: 0 3 * * *
+  #     timezone: America/New_York
+  #   retries: 0
+  #   timeout_seconds: 7200
 
   # Million Verifier bulk verification with the 2% bounce circuit-breaker.
-  # Credits are money: retries stay 0.
-  verify-emails-daily:
-    command: npm run job:verify-emails-daily
-    schedule:
-      cron: 0 5 * * *
-      timezone: America/New_York
-    retries: 0
-    timeout_seconds: 3600
+  # verify-emails-daily:
+  #   command: npm run job:verify-emails-daily
+  #   schedule:
+  #     cron: 0 5 * * *
+  #     timezone: America/New_York
+  #   retries: 0
+  #   timeout_seconds: 3600
 
-  # AEO prompt panel: 20 prompts x 4 models monthly through the OpenRouter
-  # proxy; results in aeo_results, charted at /aeo.
-  aeo-panel-monthly:
-    command: npm run job:aeo-panel-monthly
-    schedule:
-      cron: 0 8 1 * *
-      timezone: America/New_York
-    retries: 1
-    timeout_seconds: 3600
+  # AEO prompt panel: 20 prompts x 4 models monthly.
+  # aeo-panel-monthly:
+  #   command: npm run job:aeo-panel-monthly
+  #   schedule:
+  #     cron: 0 8 1 * *
+  #     timezone: America/New_York
+  #   retries: 1
+  #   timeout_seconds: 3600
 
-  # Procurement watch over curated state portals; hits go to Slack for the
-  # AE, never into a sequence.
-  # SLACK_WEBHOOK_URL is intentionally not declared yet — alerts log to
-  # stdout until a webhook for this client exists; declare + set it then.
-  rfp-watch-daily:
-    command: npm run job:rfp-watch-daily
-    schedule:
-      cron: 0 6 * * 1-5
-      timezone: America/New_York
-    retries: 1
-    timeout_seconds: 1800
+  # Procurement watch over curated state portals.
+  # rfp-watch-daily:
+  #   command: npm run job:rfp-watch-daily
+  #   schedule:
+  #     cron: 0 6 * * 1-5
+  #     timezone: America/New_York
+  #   retries: 1
+  #   timeout_seconds: 1800
 
-  # Keyword volume refresh via Graphed Tools (dataforseo live volume) +
-  # seo queue re-rank. Billed per call: retries 0.
-  keyword-refresh-quarterly:
-    command: npm run job:keyword-refresh-quarterly
-    schedule:
-      cron: 0 9 1 1,4,7,10 *
-      timezone: America/New_York
-    retries: 0
-    timeout_seconds: 1800
+  # Keyword volume refresh via Graphed Tools (dataforseo).
+  # keyword-refresh-quarterly:
+  #   command: npm run job:keyword-refresh-quarterly
+  #   schedule:
+  #     cron: 0 9 1 1,4,7,10 *
+  #     timezone: America/New_York
+  #   retries: 0
+  #   timeout_seconds: 1800
 
-  # Meta Andromeda creative factory (04 §5, 07 §4.10): persona × angle
-  # matrix → HeyGen videos + Kie statics into project storage, ledgered in
-  # fb_creatives. Generation only — no Meta publish path until the Business
-  # Manager assets land (02 §Meta). Billed per render: retries 0.
-  # Timeout sized for the first cloud run, which generates the full matrix
-  # (measured ~2.1 min/asset locally; ~90 assets ≈ 3.2h → 4h ceiling).
-  # Steady-state weekly runs only render newly added matrix rows.
-  fb-creative-factory-weekly:
-    command: npm run job:fb-creative-factory-weekly
-    schedule:
-      cron: 0 6 * * 1
-      timezone: America/New_York
-    retries: 0
-    timeout_seconds: 14400
+  # Meta Andromeda creative factory (HeyGen + Kie). Billed per render.
+  # fb-creative-factory-weekly:
+  #   command: npm run job:fb-creative-factory-weekly
+  #   schedule:
+  #     cron: 0 6 * * 1
+  #     timezone: America/New_York
+  #   retries: 0
+  #   timeout_seconds: 14400
