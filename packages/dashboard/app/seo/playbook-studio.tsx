@@ -202,7 +202,7 @@ export function PlaybookStudio({
                   <span
                     className={
                       actionMessage.status === "error"
-                        ? "text-red-400"
+                        ? "text-red-700"
                         : "text-emerald-400"
                     }
                   >
@@ -254,7 +254,7 @@ export function PlaybookStudio({
       </Card>
 
       {testState.status === "error" ? (
-        <div className="rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-700">
           {testState.error}
         </div>
       ) : null}

@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const groups = [...new Set(enabledPlugins.map((entry) => entry.group))];
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body className="min-h-screen bg-background text-foreground antialiased">
         <div className="flex min-h-screen">
           <aside className="flex w-60 shrink-0 flex-col border-r bg-card/40">

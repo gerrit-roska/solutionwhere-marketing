@@ -22,7 +22,7 @@ export default function SeoError({
     <div className="mx-auto max-w-4xl py-12">
       <Card className="border-red-500/30 bg-red-500/5">
         <CardHeader>
-          <CardTitle className="text-base text-red-300">
+          <CardTitle className="text-base text-red-700">
             Something went wrong on this page
           </CardTitle>
           <CardDescription>{error.message}</CardDescription>

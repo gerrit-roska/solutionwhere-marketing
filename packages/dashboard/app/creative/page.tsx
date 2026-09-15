@@ -133,7 +133,7 @@ export default async function CreativePage() {
                           href={row.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-sm text-blue-400 underline"
+                          className="text-sm text-primary underline"
                         >
                           view
                         </a>

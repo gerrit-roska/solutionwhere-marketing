@@ -136,7 +136,7 @@ export default async function OverviewPage() {
       {"error" in data ? (
         <Card className="border-amber-500/30 bg-amber-500/5">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base text-amber-400">
+            <CardTitle className="flex items-center gap-2 text-base text-amber-700">
               <TriangleAlert className="h-4 w-4" />
               Database not reachable
             </CardTitle>

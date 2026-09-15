@@ -279,7 +279,7 @@ export default async function SeoPage({
           {"error" in queue ? (
         <Card className="border-amber-500/30 bg-amber-500/5">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base text-amber-400">
+            <CardTitle className="flex items-center gap-2 text-base text-amber-700">
               <TriangleAlert className="h-4 w-4" />
               SEO tables not found
             </CardTitle>
@@ -495,7 +495,7 @@ function Banner({ tone, message }: { tone: "notice" | "error"; message: string }
     <div
       className={
         tone === "error"
-          ? "rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+          ? "rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-700"
           : "rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300"
       }
     >
