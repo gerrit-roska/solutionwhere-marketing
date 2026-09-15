@@ -1,0 +1,497 @@
+keyword,volume,cpc_usd,competition
+"ctle",368000,0.06,0.01
+"moecs",18100,3.31,0
+"moecs login",6600,0,0
+"coaching tracker",2900,0.47,0.12
+"scech",1900,2.2,0.03
+"scechs",1900,2.2,0.03
+"lvis indiana",1900,0,0
+"pre k registration",1900,2.99,0.34
+"texas teacher license renewal",1600,1.26,0.03
+"act 48",1600,2,0.02
+"act 48 hours",1300,2.13,0.06
+"elis isbe login",1300,0,0
+"perms act 48",1000,2,0.01
+"elis isbe",1000,0,0
+"safeschools training",880,1.27,0.14
+"ohio teacher license renewal",720,3,0.05
+"adeconnect",720,0,0
+"powerschool enrollment login",720,4.91,0.01
+"lpdc",590,0,0
+"minnesota teacher relicensure",590,2.01,0.01
+"california teacher certification renewal",480,5.05,0.01
+"north carolina teacher license renewal",480,0,0
+"escworks login",480,0,0
+"teachboost login",480,0,0
+"florida teacher certification renewal",390,1.16,0.02
+"lvis indiana login",390,0,0
+"ksde license renewal",390,0,0
+"mentoring tracking system",390,6.88,0.17
+"arkansas teacher certification renewal",320,0,0
+"arkansas teacher license renewal",320,0,0
+"ctle hours",320,1.5,0.24
+"indiana teacher license renewal",260,0,0
+"iowa teacher license renewal",260,0,0
+"oklahoma teacher license renewal",260,0,0
+"adeconnect login",260,0,0
+"colorado teacher license renewal",210,0,0
+"kansas teacher license renewal",210,0,0
+"michigan teacher certification renewal",210,0,0.01
+"michigan teacher license renewal",210,0,0.02
+"finalsite enrollment",210,3.76,0.32
+"schoolmint admin",210,0,0
+"alabama teacher certification renewal",170,0,0
+"utah teacher certification renewal",170,0,0
+"utah teacher license renewal",170,0,0
+"whetstone education",170,0,0.01
+"ccr r",170,3.99,0.05
+"act 48 login",140,0,0
+"kentucky epsb",140,0,0
+"idaho teacher certification renewal",110,0,0
+"illinois teacher certification renewal",110,0,0.02
+"illinois teacher license renewal",110,0,0.02
+"minnesota teacher license renewal",110,0,0
+"coaching log template",110,0,0.06
+"north dakota teacher license renewal",90,0,0.01
+"perms act 48 login",90,0,0
+"isbe professional development hours",90,1.6,0.14
+"plu georgia",90,0,0.02
+"walkthrough app",90,14.94,0.26
+"school choice lottery",90,3.71,0.07
+"registration gateway",90,0,0.05
+"frontline education professional growth",90,2.08,0.07
+"louisiana teacher certification renewal",70,0,0
+"nebraska teacher certification renewal",70,0,0.01
+"how to renew teaching license in ohio",70,0,0.02
+"tennessee teacher certification renewal",70,0,0
+"texas teacher certification renewal",70,0,0.02
+"virginia teacher certification renewal",70,0,0
+"virginia teacher license renewal",70,0,0
+"wisconsin teacher license renewal",70,0,0
+"act 48 hours login",70,0,0
+"ipdp ohio",70,0,0
+"kentucky teacher certification renewal",50,0,0
+"nevada teacher license renewal",50,0,0
+"oregon teacher license renewal",50,0,0
+"south dakota teacher certification renewal",50,0,0
+"california clear credential",50,2.69,0.18
+"professional development tracker",50,6.39,0.39
+"online student registration",50,5.18,0.38
+"enrollment management system",50,20.79,0.23
+"alaska teacher certification renewal",40,0,0
+"mississippi teacher license renewal",40,0,0
+"teacher evaluation software",40,3.02,0.28
+"kindergarten registration online",40,4.06,0.31
+"kalpa professional development",40,0,0
+"childcare referral service",40,0,0.31
+"florida teacher license renewal",30,0,0.01
+"georgia teacher certification renewal",30,0,0.01
+"cpe hours texas",30,1.5,0.36
+"indiana pgp points",30,0,0
+"professional development log",30,0,0.1
+"student registration system",30,0,0.14
+"magnet lottery",30,0,0.01
+"bullseye evaluation",30,0,0.03
+"how to renew teaching license in indiana",20,0,0
+"maryland teacher certification renewal",20,0,0.02
+"massachusetts teacher certification renewal",20,0,0.04
+"massachusetts teacher license renewal",20,0,0
+"montana teacher license renewal",20,0,0
+"new mexico teacher license renewal",20,0,0.01
+"oklahoma teacher certification renewal",20,0,0
+"south carolina teacher certification renewal",20,0,0
+"tennessee teacher license renewal",20,0,0
+"vermont teacher license renewal",20,0,0
+"ctle requirements",20,0,0.05
+"tea cpe",20,2.49,0.16
+"virginia teacher recertification points",20,0,0.01
+"pdps massachusetts",20,2.23,0.21
+"instructional coaching log",20,0,0.18
+"k 12 online registration",20,8.3,0.58
+"schoolstatus boost",20,0,0.13
+"arizona teacher certification renewal",10,0,0.01
+"california teacher professional development requirements",10,0,0
+"connecticut teacher certification renewal",10,0,0
+"hawaii teacher license renewal",10,0,0
+"illinois teacher professional development requirements",10,0,0.06
+"maine teacher certification renewal",10,0,0
+"michigan teaching certificate renewal requirements",10,0,0.04
+"missouri teacher certification renewal",10,0,0
+"nebraska teaching certificate renewal requirements",10,0,0
+"new york teacher certification renewal",10,0,0
+"ohio teacher certification renewal",10,0,0
+"oklahoma teacher professional development requirements",10,0,0
+"pennsylvania teacher certification renewal",10,0,0
+"wisconsin pdp",10,0,0
+"georgia plu credits",10,0,0
+"tspc pdu",10,0,0
+"classroom observation app",10,0,0.43
+"pd tracker",10,0,0.02
+"charter school lottery software",10,0,0.54
+"vector solutions education",10,0,0.03
+"kalpa pd",10,0,0
+"sibme coaching",10,0,0.08
+"alabama teacher license renewal",0,0,0
+"how to renew teaching license in alabama",0,0,0
+"alabama teaching certificate renewal requirements",0,0,0
+"alabama teacher professional development requirements",0,0,0
+"alaska teacher license renewal",0,0,0
+"how to renew teaching license in alaska",0,0,0
+"alaska teaching certificate renewal requirements",0,0,0
+"alaska teacher professional development requirements",0,0,0
+"arizona teacher license renewal",0,0,0
+"how to renew teaching license in arizona",0,0,0
+"arizona teaching certificate renewal requirements",0,0,0
+"arizona teacher professional development requirements",0,0,0
+"how to renew teaching license in arkansas",0,0,0
+"arkansas teaching certificate renewal requirements",0,0,0
+"arkansas teacher professional development requirements",0,0,0
+"california teacher license renewal",0,0,0
+"how to renew teaching license in california",0,0,0
+"california teaching certificate renewal requirements",0,0,0
+"colorado teacher certification renewal",0,0,0
+"how to renew teaching license in colorado",0,0,0
+"colorado teaching certificate renewal requirements",0,0,0
+"colorado teacher professional development requirements",0,0,0
+"connecticut teacher license renewal",0,0,0
+"how to renew teaching license in connecticut",0,0,0
+"connecticut teaching certificate renewal requirements",0,0,0
+"connecticut teacher professional development requirements",0,0,0
+"delaware teacher certification renewal",0,0,0
+"delaware teacher license renewal",0,0,0
+"how to renew teaching license in delaware",0,0,0
+"delaware teaching certificate renewal requirements",0,0,0
+"delaware teacher professional development requirements",0,0,0
+"how to renew teaching license in florida",0,0,0
+"florida teaching certificate renewal requirements",0,0,0
+"florida teacher professional development requirements",0,0,0
+"georgia teacher license renewal",0,0,0
+"how to renew teaching license in georgia",0,0,0
+"georgia teaching certificate renewal requirements",0,0,0
+"georgia teacher professional development requirements",0,0,0
+"hawaii teacher certification renewal",0,0,0
+"how to renew teaching license in hawaii",0,0,0
+"hawaii teaching certificate renewal requirements",0,0,0
+"hawaii teacher professional development requirements",0,0,0
+"idaho teacher license renewal",0,0,0
+"how to renew teaching license in idaho",0,0,0
+"idaho teaching certificate renewal requirements",0,0,0
+"idaho teacher professional development requirements",0,0,0
+"how to renew teaching license in illinois",0,0,0
+"illinois teaching certificate renewal requirements",0,0,0
+"indiana teacher certification renewal",0,0,0
+"indiana teaching certificate renewal requirements",0,0,0
+"indiana teacher professional development requirements",0,0,0
+"iowa teacher certification renewal",0,0,0
+"how to renew teaching license in iowa",0,0,0
+"iowa teaching certificate renewal requirements",0,0,0
+"iowa teacher professional development requirements",0,0,0
+"kansas teacher certification renewal",0,0,0
+"how to renew teaching license in kansas",0,0,0
+"kansas teaching certificate renewal requirements",0,0,0
+"kansas teacher professional development requirements",0,0,0
+"kentucky teacher license renewal",0,0,0
+"how to renew teaching license in kentucky",0,0,0
+"kentucky teaching certificate renewal requirements",0,0,0
+"kentucky teacher professional development requirements",0,0,0
+"louisiana teacher license renewal",0,0,0
+"how to renew teaching license in louisiana",0,0,0
+"louisiana teaching certificate renewal requirements",0,0,0
+"louisiana teacher professional development requirements",0,0,0
+"maine teacher license renewal",0,0,0
+"how to renew teaching license in maine",0,0,0
+"maine teaching certificate renewal requirements",0,0,0
+"maine teacher professional development requirements",0,0,0
+"maryland teacher license renewal",0,0,0
+"how to renew teaching license in maryland",0,0,0
+"maryland teaching certificate renewal requirements",0,0,0
+"maryland teacher professional development requirements",0,0,0
+"how to renew teaching license in massachusetts",0,0,0
+"massachusetts teaching certificate renewal requirements",0,0,0
+"massachusetts teacher professional development requirements",0,0,0
+"how to renew teaching license in michigan",0,0,0
+"michigan teacher professional development requirements",0,0,0
+"minnesota teacher certification renewal",0,0,0
+"how to renew teaching license in minnesota",0,0,0
+"minnesota teaching certificate renewal requirements",0,0,0
+"minnesota teacher professional development requirements",0,0,0
+"mississippi teacher certification renewal",0,0,0
+"how to renew teaching license in mississippi",0,0,0
+"mississippi teaching certificate renewal requirements",0,0,0
+"mississippi teacher professional development requirements",0,0,0
+"missouri teacher license renewal",0,0,0
+"how to renew teaching license in missouri",0,0,0
+"missouri teaching certificate renewal requirements",0,0,0
+"missouri teacher professional development requirements",0,0,0
+"montana teacher certification renewal",0,0,0
+"how to renew teaching license in montana",0,0,0
+"montana teaching certificate renewal requirements",0,0,0
+"montana teacher professional development requirements",0,0,0
+"nebraska teacher license renewal",0,0,0
+"how to renew teaching license in nebraska",0,0,0
+"nebraska teacher professional development requirements",0,0,0
+"nevada teacher certification renewal",0,0,0
+"how to renew teaching license in nevada",0,0,0
+"nevada teaching certificate renewal requirements",0,0,0
+"nevada teacher professional development requirements",0,0,0
+"new hampshire teacher certification renewal",0,0,0
+"new hampshire teacher license renewal",0,0,0
+"how to renew teaching license in new hampshire",0,0,0
+"new hampshire teaching certificate renewal requirements",0,0,0
+"new hampshire teacher professional development requirements",0,0,0
+"new jersey teacher certification renewal",0,0,0
+"new jersey teacher license renewal",0,0,0
+"how to renew teaching license in new jersey",0,0,0
+"new jersey teaching certificate renewal requirements",0,0,0
+"new jersey teacher professional development requirements",0,0,0
+"new mexico teacher certification renewal",0,0,0
+"how to renew teaching license in new mexico",0,0,0
+"new mexico teaching certificate renewal requirements",0,0,0
+"new mexico teacher professional development requirements",0,0,0
+"new york teacher license renewal",0,0,0
+"how to renew teaching license in new york",0,0,0
+"new york teaching certificate renewal requirements",0,0,0
+"new york teacher professional development requirements",0,0,0
+"north carolina teacher certification renewal",0,0,0
+"how to renew teaching license in north carolina",0,0,0
+"north carolina teaching certificate renewal requirements",0,0,0
+"north carolina teacher professional development requirements",0,0,0
+"north dakota teacher certification renewal",0,0,0
+"how to renew teaching license in north dakota",0,0,0
+"north dakota teaching certificate renewal requirements",0,0,0
+"north dakota teacher professional development requirements",0,0,0
+"ohio teaching certificate renewal requirements",0,0,0
+"ohio teacher professional development requirements",0,0,0
+"how to renew teaching license in oklahoma",0,0,0
+"oklahoma teaching certificate renewal requirements",0,0,0
+"oregon teacher certification renewal",0,0,0
+"how to renew teaching license in oregon",0,0,0
+"oregon teaching certificate renewal requirements",0,0,0
+"oregon teacher professional development requirements",0,0,0
+"pennsylvania teacher license renewal",0,0,0
+"how to renew teaching license in pennsylvania",0,0,0
+"pennsylvania teaching certificate renewal requirements",0,0,0
+"pennsylvania teacher professional development requirements",0,0,0
+"rhode island teacher certification renewal",0,0,0
+"rhode island teacher license renewal",0,0,0
+"how to renew teaching license in rhode island",0,0,0
+"rhode island teaching certificate renewal requirements",0,0,0
+"rhode island teacher professional development requirements",0,0,0
+"south carolina teacher license renewal",0,0,0
+"how to renew teaching license in south carolina",0,0,0
+"south carolina teaching certificate renewal requirements",0,0,0
+"south carolina teacher professional development requirements",0,0,0
+"south dakota teacher license renewal",0,0,0
+"how to renew teaching license in south dakota",0,0,0
+"south dakota teaching certificate renewal requirements",0,0,0
+"south dakota teacher professional development requirements",0,0,0
+"how to renew teaching license in tennessee",0,0,0
+"tennessee teaching certificate renewal requirements",0,0,0
+"tennessee teacher professional development requirements",0,0,0
+"how to renew teaching license in texas",0,0,0
+"texas teaching certificate renewal requirements",0,0,0
+"texas teacher professional development requirements",0,0,0
+"how to renew teaching license in utah",0,0,0
+"utah teaching certificate renewal requirements",0,0,0
+"utah teacher professional development requirements",0,0,0
+"vermont teacher certification renewal",0,0,0
+"how to renew teaching license in vermont",0,0,0
+"vermont teaching certificate renewal requirements",0,0,0
+"vermont teacher professional development requirements",0,0,0
+"how to renew teaching license in virginia",0,0,0
+"virginia teaching certificate renewal requirements",0,0,0
+"virginia teacher professional development requirements",0,0,0
+"washington teacher certification renewal",0,0,0
+"washington teacher license renewal",0,0,0
+"how to renew teaching license in washington",0,0,0
+"washington teaching certificate renewal requirements",0,0,0
+"washington teacher professional development requirements",0,0,0
+"west virginia teacher certification renewal",0,0,0
+"west virginia teacher license renewal",0,0,0
+"how to renew teaching license in west virginia",0,0,0
+"west virginia teaching certificate renewal requirements",0,0,0
+"west virginia teacher professional development requirements",0,0,0
+"wisconsin teacher certification renewal",0,0,0
+"how to renew teaching license in wisconsin",0,0,0
+"wisconsin teaching certificate renewal requirements",0,0,0
+"wisconsin teacher professional development requirements",0,0,0
+"wyoming teacher certification renewal",0,0,0
+"wyoming teacher license renewal",0,0,0
+"how to renew teaching license in wyoming",0,0,0
+"wyoming teaching certificate renewal requirements",0,0,0
+"wyoming teacher professional development requirements",0,0,0
+"scech tracking",0,0,0
+"scech login",0,0,0
+"scechs tracking",0,0,0
+"scechs login",0,0,0
+"moecs tracking",0,0,0
+"act 48 tracking",0,0,0
+"perms act 48 tracking",0,0,0
+"act 48 hours tracking",0,0,0
+"lpdc tracking",0,0,0
+"lpdc login",0,0,0
+"ohio lpdc",0,0,0
+"ohio lpdc tracking",0,0,0
+"ohio lpdc login",0,0,0
+"ipdp ohio tracking",0,0,0
+"ipdp ohio login",0,0,0
+"ctle tracking",0,0,0
+"ctle login",0,0,0
+"ctle hours tracking",0,0,0
+"ctle hours login",0,0,0
+"ctle requirements tracking",0,0,0
+"ctle requirements login",0,0,0
+"cpe hours texas tracking",0,0,0
+"cpe hours texas login",0,0,0
+"texas cpe requirements teachers",0,0,0
+"texas cpe requirements teachers tracking",0,0,0
+"texas cpe requirements teachers login",0,0,0
+"tea cpe tracking",0,0,0
+"tea cpe login",0,0,0
+"isbe professional development hours tracking",0,0,0
+"isbe professional development hours login",0,0,0
+"illinois pd clock hours",0,0,0
+"illinois pd clock hours tracking",0,0,0
+"illinois pd clock hours login",0,0,0
+"elis isbe tracking",0,0,0
+"clu louisiana teachers",0,0,0
+"clu louisiana teachers tracking",0,0,0
+"clu louisiana teachers login",0,0,0
+"louisiana continuing learning units",0,0,0
+"louisiana continuing learning units tracking",0,0,0
+"louisiana continuing learning units login",0,0,0
+"pgp indiana teacher",0,0,0
+"pgp indiana teacher tracking",0,0,0
+"pgp indiana teacher login",0,0,0
+"indiana pgp points tracking",0,0,0
+"indiana pgp points login",0,0,0
+"lvis indiana tracking",0,0,0
+"florida inservice points",0,0,0
+"florida inservice points tracking",0,0,0
+"florida inservice points login",0,0,0
+"master inservice plan florida",0,0,0
+"master inservice plan florida tracking",0,0,0
+"master inservice plan florida login",0,0,0
+"wisconsin pdp tracking",0,0,0
+"wisconsin pdp login",0,0,0
+"pdp wisconsin teacher",0,0,0
+"pdp wisconsin teacher tracking",0,0,0
+"pdp wisconsin teacher login",0,0,0
+"missouri pdc",0,0,0
+"missouri pdc tracking",0,0,0
+"missouri pdc login",0,0,0
+"missouri teacher professional development hours",0,0,0
+"missouri teacher professional development hours tracking",0,0,0
+"missouri teacher professional development hours login",0,0,0
+"plu georgia tracking",0,0,0
+"plu georgia login",0,0,0
+"georgia plu credits tracking",0,0,0
+"georgia plu credits login",0,0,0
+"california clear credential tracking",0,0,0
+"california clear credential login",0,0,0
+"ctc renewal california",0,0,0
+"ctc renewal california tracking",0,0,0
+"ctc renewal california login",0,0,0
+"arizona teacher certification renewal hours",0,0,0
+"arizona teacher certification renewal hours tracking",0,0,0
+"arizona teacher certification renewal hours login",0,0,0
+"adeconnect tracking",0,0,0
+"kentucky epsb tracking",0,0,0
+"kentucky epsb login",0,0,0
+"epsb renewal",0,0,0
+"epsb renewal tracking",0,0,0
+"epsb renewal login",0,0,0
+"ceu north carolina teachers",0,0,0
+"ceu north carolina teachers tracking",0,0,0
+"ceu north carolina teachers login",0,0,0
+"nc teacher license renewal ceus",0,0,0
+"nc teacher license renewal ceus tracking",0,0,0
+"nc teacher license renewal ceus login",0,0,0
+"virginia teacher recertification points tracking",0,0,0
+"virginia teacher recertification points login",0,0,0
+"virginia professional development points",0,0,0
+"virginia professional development points tracking",0,0,0
+"virginia professional development points login",0,0,0
+"washington clock hours teachers",0,0,0
+"washington clock hours teachers tracking",0,0,0
+"washington clock hours teachers login",0,0,0
+"pesb clock hours",0,0,0
+"pesb clock hours tracking",0,0,0
+"pesb clock hours login",0,0,0
+"colorado teacher license renewal hours",0,0,0
+"colorado teacher license renewal hours tracking",0,0,0
+"colorado teacher license renewal hours login",0,0,0
+"minnesota teacher relicensure tracking",0,0,0
+"minnesota teacher relicensure login",0,0,0
+"pelsb renewal",0,0,0
+"pelsb renewal tracking",0,0,0
+"pelsb renewal login",0,0,0
+"new jersey teacher professional development hours",0,0,0
+"new jersey teacher professional development hours tracking",0,0,0
+"new jersey teacher professional development hours login",0,0,0
+"massachusetts pdp points",0,0,0
+"massachusetts pdp points tracking",0,0,0
+"massachusetts pdp points login",0,0,0
+"pdps massachusetts tracking",0,0,0
+"pdps massachusetts login",0,0,0
+"tennessee pdp points",0,0,0
+"tennessee pdp points tracking",0,0,0
+"tennessee pdp points login",0,0,0
+"south carolina teacher renewal credits",0,0,0
+"south carolina teacher renewal credits tracking",0,0,0
+"south carolina teacher renewal credits login",0,0,0
+"oklahoma teacher professional development points",0,0,0
+"oklahoma teacher professional development points tracking",0,0,0
+"oklahoma teacher professional development points login",0,0,0
+"ksde license renewal tracking",0,0,0
+"ksde license renewal login",0,0,0
+"kansas pdc points",0,0,0
+"kansas pdc points tracking",0,0,0
+"kansas pdc points login",0,0,0
+"nevada teacher license renewal credits",0,0,0
+"nevada teacher license renewal credits tracking",0,0,0
+"nevada teacher license renewal credits login",0,0,0
+"oregon pdu teacher",0,0,0
+"oregon pdu teacher tracking",0,0,0
+"oregon pdu teacher login",0,0,0
+"tspc pdu tracking",0,0,0
+"tspc pdu login",0,0,0
+"iowa license renewal credits teachers",0,0,0
+"iowa license renewal credits teachers tracking",0,0,0
+"iowa license renewal credits teachers login",0,0,0
+"boee renewal",0,0,0
+"boee renewal tracking",0,0,0
+"boee renewal login",0,0,0
+"nebraska teacher certificate renewal hours",0,0,0
+"nebraska teacher certificate renewal hours tracking",0,0,0
+"nebraska teacher certificate renewal hours login",0,0,0
+"utah teacher license renewal points",0,0,0
+"utah teacher license renewal points tracking",0,0,0
+"utah teacher license renewal points login",0,0,0
+"mentor tracking software",0,0,0
+"teacher mentoring software",0,0,0
+"teacher induction software",0,0,0
+"new teacher mentoring program software",0,0,0
+"teacher pd hours tracker",0,0,0
+"school registration system",0,0,0
+"school lottery",0,0,0
+"frontline professional growth admin",0,0,0
+"vector solutions k12",0,0,0
+"escworks registration",0,0,0
+"pdplanner",0,0,0
+"schooldata net",0,0,0
+"kickup foundations",0,0,0
+"schoolstatus coach",0,0,0
+"level data grow",0,0,0
+"growelab",0,0,0
+"iris connect coaching",0,0,0
+"worklife systems child care",0,0,0
+"icarol child care",0,0,0
+"kindersystems login",0,0,0
+"bridgecare login",0,0,0
+"tootris ccrr",0,0,0
+"ccr&r",0,0,0
+"child care resource and referral",0,0,0
+"child care resource and referral near me",0,0,0
+"ccrr agency",0,0,0
+"child care referral",0,0,0

@@ -4,6 +4,8 @@ node_modules/
 dist/
 .env
 .env.local
+# Generated SEO draft exports (regenerate with scripts/export-seo-drafts.ts)
+exports/
 # Staged plugin kits are local scratch. (.graphed.json IS committed on
 # purpose — it only holds the account id linking this repo to Graphed.)
 .graphed/plugins

@@ -133,7 +133,7 @@ export async function runDirectories(): Promise<void> {
               email: contact.email,
               email_source: "directory",
             })
-            .onConflict((oc) => oc.column("email").doNothing())
+            .onConflict((oc) => oc.doNothing())
             .execute();
           added += 1;
         } catch {

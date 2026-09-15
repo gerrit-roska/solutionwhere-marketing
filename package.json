@@ -15,12 +15,14 @@
     "typecheck": "tsc --noEmit",
     "db:migrate": "npm run -w @app/core db:migrate",
     "db:reset": "docker compose down -v && docker compose up -d && sleep 2 && npm run db:migrate",
-    "job:seo-publish-daily": "npm run -w @app/jobs job:seo-publish-daily",
-    "job:list-build-nightly": "npm run -w @app/jobs job:list-build-nightly",
-    "job:verify-emails-daily": "npm run -w @app/jobs job:verify-emails-daily",
-    "job:aeo-panel-monthly": "npm run -w @app/jobs job:aeo-panel-monthly",
-    "job:rfp-watch-daily": "npm run -w @app/jobs job:rfp-watch-daily",
-    "job:keyword-refresh-quarterly": "npm run -w @app/jobs job:keyword-refresh-quarterly"
+    "job:seo-publish-daily": "npm run -w @app/jobs job:seo-publish-daily --",
+    "job:list-build-nightly": "npm run -w @app/jobs job:list-build-nightly --",
+    "job:verify-emails-daily": "npm run -w @app/jobs job:verify-emails-daily --",
+    "job:aeo-panel-monthly": "npm run -w @app/jobs job:aeo-panel-monthly --",
+    "job:rfp-watch-daily": "npm run -w @app/jobs job:rfp-watch-daily --",
+    "job:keyword-refresh-quarterly": "npm run -w @app/jobs job:keyword-refresh-quarterly --",
+    "job:google-ads-daily": "npm run -w @app/jobs job:google-ads-daily --",
+    "job:fb-creative-factory-weekly": "npm run -w @app/jobs job:fb-creative-factory-weekly --"
   },
   "dependencies": {
     "tsx": "^4.19.2"

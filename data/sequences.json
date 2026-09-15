@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "source": "docs/06-cold-email-execution.md §6",
+  "notes": {
+    "format": "Plain text only. {{}} denotes merge fields. No link tracking or redirect domains in any email; bare URLs from email 2 onward (§5.4).",
+    "copy_rules": "§6.6: email 1 under 120 words; one question at the end; name a peer agency in the first three lines; no feature lists; no merge field in the subject line; rewrite {{peer_agency}} per state wave.",
+    "send_window": "Tue–Thu 7:30–9:30am recipient local time (§5.4).",
+    "usage": "Loaded into the sequencer (Instantly) one campaign per module per wave once mailboxes are warm. There is deliberately no send job in this repo yet — see docs/RESEARCH.md."
+  },
+  "merge_fields": [
+    "first_name",
+    "account_name",
+    "peer_agency",
+    "peer_contact_name",
+    "year",
+    "state_credit_system",
+    "sender_name",
+    "sender_title",
+    "other_module",
+    "other_module_problem"
+  ],
+  "sequences": [
+    {
+      "id": "pd-cold",
+      "module": "pd",
+      "name": "PD — cold, district or ESA (§6.1)",
+      "steps": [
+        {
+          "day": 0,
+          "subject": "PD registration at {{account_name}}",
+          "body": "{{first_name}} — quick one.\n\n{{peer_agency}} was running PD registration through a shared spreadsheet and a Google Form, and the recertification report at the end of the year took two people about a week to assemble.\n\nThey've been on Wisdomwhere since {{year}}. The report is now a button.\n\nHow is {{account_name}} handling PD registration and credit tracking right now?\n\n{{sender_name}}\n{{sender_title}}, Solutionwhere\n231-935-3000\nReply \"no\" and I'll leave it here."
+        },
+        {
+          "day": 4,
+          "subject": "re: PD registration at {{account_name}}",
+          "body": "One number, then I'll stop taking your time.\n\nAgencies that move off spreadsheets typically cut registration administration by about 80 percent. That's not the interesting part though — the interesting part is that {{state_credit_system}} reporting stops being a project.\n\nWe've been doing this since 1996 and we're still the same company. No acquisition, no forced migration.\n\nWorth twenty minutes?"
+        },
+        {
+          "day": 8,
+          "subject": "someone better to talk to than me",
+          "body": "{{first_name}} — you'd probably rather hear this from a peer than from a vendor.\n\n{{peer_contact_name}} at {{peer_agency}} has offered to take calls from other agencies looking at this. No pitch, no us on the line.\n\nWant me to make the introduction?"
+        },
+        {
+          "day": 11,
+          "subject": "closing the loop",
+          "body": "Understood — wrong time or wrong problem.\n\nTwo things in case they're useful later:\n\nBudget requests for next year get written January through March in most agencies. If PD registration is on the list then, we're at solutionwhere.com and 231-935-3000.\n\nAnd if you're on CourseWhere or an older Wisdomwhere version, the upgrade path is documented and we migrate the data.\n\nGood luck with the year."
+        }
+      ]
+    },
+    {
+      "id": "enrollments-cold",
+      "module": "enrollments",
+      "name": "Enrollments — cold, district (§6.2)",
+      "steps": [
+        {
+          "day": 0,
+          "subject": "registration season at {{account_name}}",
+          "body": "{{first_name}} — how long does registration season actually take your team?\n\nMost districts we talk to describe the same six weeks: paper packets, residency documents in a filing cabinet, duplicate records, and a choice lottery that someone runs in a spreadsheet and then has to defend to a board.\n\n{{peer_agency}} moved that whole thing online. Families register from a phone, in their language. Every lottery draw has a recorded seed, so it can be rerun in front of the board and produce the same result.\n\nIs registration a problem worth solving at {{account_name}} this year?\n\n{{sender_name}}\n{{sender_title}}, Solutionwhere\n231-935-3000\nReply \"no\" and I'll leave it here."
+        },
+        {
+          "day": 4,
+          "subject": "re: registration season at {{account_name}}",
+          "body": "The part that surprises people: it isn't the online forms.\n\nIt's that document review, residency verification and duplicate detection stop being manual, and that choice, waitlists and in-district transfers live on one screen instead of four systems.\n\nWhen a family asks why they were placed where they were, the answer is already in the record.\n\nTwenty minutes to see whether it fits?"
+        },
+        {
+          "day": 8,
+          "subject": "someone better to talk to than me",
+          "body": "{{first_name}} — you'd probably rather hear this from a peer than from a vendor.\n\n{{peer_contact_name}} at {{peer_agency}} has offered to take calls from other districts looking at this. No pitch, no us on the line.\n\nWant me to make the introduction?"
+        },
+        {
+          "day": 11,
+          "subject": "closing the loop",
+          "body": "No problem — timing is usually the reason.\n\nFor what it's worth, districts that change registration systems almost always decide by March, because implementation has to happen over the summer to be ready for the next season.\n\nIf that's the window, we're at solutionwhere.com and 231-935-3000."
+        }
+      ]
+    },
+    {
+      "id": "coaching-cold",
+      "module": "coaching",
+      "name": "Coaching — cold, ESA or CCR&R (§6.3)",
+      "steps": [
+        {
+          "day": 0,
+          "subject": "coaching documentation at {{account_name}}",
+          "body": "{{first_name}} — your coaches are doing the work. Can you prove it happened?\n\n{{peer_agency}} was running coaching cycles out of a shared drive: visit notes in one place, fidelity instruments in another, and a monthly report to the state that took a week to assemble.\n\nTheir coaches now log visits from the classroom on a tablet, offline. The report compiles itself.\n\nHow is {{account_name}} documenting coaching right now?\n\n{{sender_name}}\n{{sender_title}}, Solutionwhere\n231-935-3000\nReply \"no\" and I'll leave it here."
+        },
+        {
+          "day": 4,
+          "subject": "re: coaching documentation at {{account_name}}",
+          "body": "Two things that usually matter to people in your seat:\n\nIt's configured around your observation framework — not a template you have to work around. And it's non-evaluative by design: educator data only, no student PII, which shortens the conversation with your IT and compliance people.\n\nPlanned vs. delivered visits, by site, by cohort. Worth twenty minutes?"
+        },
+        {
+          "day": 8,
+          "subject": "someone better to talk to than me",
+          "body": "{{first_name}} — you'd probably rather hear this from a peer than from a vendor.\n\n{{peer_contact_name}} at {{peer_agency}} has offered to take calls from other agencies looking at this. No pitch, no us on the line.\n\nWant me to make the introduction?"
+        },
+        {
+          "day": 11,
+          "subject": "closing the loop",
+          "body": "Understood — wrong time or wrong problem.\n\nOne thing in case it's useful later: budget requests for next year get written January through March in most agencies. If coaching documentation is on the list then, we're at solutionwhere.com and 231-935-3000.\n\nGood luck with the year."
+        }
+      ]
+    },
+    {
+      "id": "referrals-cold",
+      "module": "referrals",
+      "name": "Referrals — cold, CCR&R (§6.4)",
+      "steps": [
+        {
+          "day": 0,
+          "subject": "referral tracking at {{account_name}}",
+          "body": "{{first_name}} — how many systems does a single referral touch at {{account_name}}?\n\nMost CCR&Rs we talk to are running four: intake somewhere, the provider list somewhere else, referral history in a spreadsheet, and the state report assembled by hand at the end of the quarter.\n\nWe built one system that does all four — family intake, live provider search filtered by age, hours, availability, quality rating and distance, referral history, and funder reporting generated from the operational data.\n\nWhat does your current setup look like?\n\n{{sender_name}}\n{{sender_title}}, Solutionwhere\n231-935-3000\nReply \"no\" and I'll leave it here."
+        },
+        {
+          "day": 4,
+          "subject": "re: referral tracking at {{account_name}}",
+          "body": "The piece agencies tell us matters most: follow-up and placement outcomes get recorded as part of the workflow, not as a separate data-entry task.\n\nWhich means the outcome data your funder asks for actually exists.\n\nWe've been building for education agencies since 1996. Twenty minutes?"
+        },
+        {
+          "day": 8,
+          "subject": "someone better to talk to than me",
+          "body": "{{first_name}} — you'd probably rather hear this from a peer than from a vendor.\n\n{{peer_contact_name}} at {{peer_agency}} has offered to take calls from other agencies looking at this. No pitch, no us on the line.\n\nWant me to make the introduction?"
+        },
+        {
+          "day": 11,
+          "subject": "closing the loop",
+          "body": "Understood — wrong time or wrong problem.\n\nOne thing in case it's useful later: state reporting requirements tend to drive these decisions, and budget requests for next year get written January through March. If referral tracking is on the list then, we're at solutionwhere.com and 231-935-3000.\n\nGood luck with the year."
+        }
+      ]
+    },
+    {
+      "id": "cross-sell",
+      "module": "cross_sell",
+      "name": "Cross-sell — existing customer, different department (§6.5). Highest yield: run week one from the main domain.",
+      "steps": [
+        {
+          "day": 0,
+          "subject": "the {{other_module}} side of {{account_name}}",
+          "body": "{{first_name}} — {{account_name}} has run PD registration on Wisdomwhere since {{year}}, so you already know how we build and who answers the phone.\n\nThe team that handles {{other_module_problem}} at {{account_name}} is probably still doing it the hard way. Same kind of problem, one department over — and it's the same login, the same support team, and the same contract vehicle you already have.\n\nWho owns that over there? Happy to be introduced rather than cold-call them.\n\n{{sender_name}}\n{{sender_title}}, Solutionwhere\n231-935-3000"
+        },
+        {
+          "day": 5,
+          "subject": "re: the {{other_module}} side of {{account_name}}",
+          "body": "One concrete outcome, then I'll leave it alone.\n\nAgencies that move {{other_module_problem}} onto Solutionwhere stop re-entering the same data in two places — the records you already have carry over, and the report the other team assembles by hand today comes out of the system.\n\nHappy to do twenty minutes with you and whoever owns it on the same call, so nobody has to translate.\n\nWorth setting up?"
+        },
+        {
+          "day": 10,
+          "subject": "something to forward",
+          "body": "{{first_name}} — easier if you don't have to explain it.\n\nWant me to send a one-pager on the {{other_module}} side that you can forward internally? It names the contract vehicle you already have, so the procurement question is answered before it's asked.\n\nWho should it go to?"
+        }
+      ]
+    }
+  ]
+}

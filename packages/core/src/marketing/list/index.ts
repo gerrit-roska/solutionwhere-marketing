@@ -1,6 +1,8 @@
 import { runNces } from "./nces";
 import { runAesa } from "./aesa";
 import { runDirectories } from "./directories";
+import { runWebsiteResolution } from "./websites";
+import { runGetleadsEnrichment } from "./enrich";
 
 // Nightly rotation (07 §4.2): one source per night, tracked in source_runs.
 //   Sun    NCES CCD LEA universe (annual data; monthly re-run is harmless)
@@ -8,7 +10,8 @@ import { runDirectories } from "./directories";
 //   Tue    State CCR&R networks   — needs data/state-source-urls.csv (curated
 //                                   by hand; module lands with that file)
 //   Wed    Head Start locator     — needs the dataset export path confirmed
-//   Thu-Sat Staff directories for accounts due re-verification
+//   Thu-Sat Website resolution (FDE-530) → staff directories for accounts
+//           due re-verification
 //
 // Tue/Wed log-and-skip until their curated inputs exist rather than
 // pretending coverage. FORCE_SOURCE=<name> overrides the rotation for
@@ -39,8 +42,20 @@ export async function run(): Promise<void> {
         "headstart: locator export path not confirmed yet — skipping (06 §2.4; site 403s naive fetchers).",
       );
       break;
+    case "websites":
+      await runWebsiteResolution();
+      break;
+    case "enrich":
+      await runGetleadsEnrichment();
+      break;
     case "directories":
+      // Resolve missing websites first so the crawl has something to work
+      // with (FDE-530), crawl what's due, then enrich the accounts where
+      // the directory yielded nothing (06 §3.5 — most district directories
+      // are JS apps with no emails in the raw HTML).
+      await runWebsiteResolution();
       await runDirectories();
+      await runGetleadsEnrichment();
       break;
     default:
       throw new Error(`Unknown source: ${source}`);

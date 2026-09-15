@@ -90,3 +90,18 @@ jobs:
       timezone: America/New_York
     retries: 0
     timeout_seconds: 1800
+
+  # Meta Andromeda creative factory (04 §5, 07 §4.10): persona × angle
+  # matrix → HeyGen videos + Kie statics into project storage, ledgered in
+  # fb_creatives. Generation only — no Meta publish path until the Business
+  # Manager assets land (02 §Meta). Billed per render: retries 0.
+  # Timeout sized for the first cloud run, which generates the full matrix
+  # (measured ~2.1 min/asset locally; ~90 assets ≈ 3.2h → 4h ceiling).
+  # Steady-state weekly runs only render newly added matrix rows.
+  fb-creative-factory-weekly:
+    command: npm run job:fb-creative-factory-weekly
+    schedule:
+      cron: 0 6 * * 1
+      timezone: America/New_York
+    retries: 0
+    timeout_seconds: 14400

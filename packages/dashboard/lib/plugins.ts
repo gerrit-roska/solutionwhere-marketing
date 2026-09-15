@@ -34,4 +34,18 @@ export const pluginNavEntries: PluginNavEntry[] = [
     group: "Channels",
     enabled: true,
   },
+  {
+    key: "ads",
+    label: "Google Ads",
+    href: "/ads",
+    group: "Channels",
+    enabled: true,
+  },
+  {
+    key: "creative",
+    label: "Creative",
+    href: "/creative",
+    group: "Channels",
+    enabled: true,
+  },
 ];

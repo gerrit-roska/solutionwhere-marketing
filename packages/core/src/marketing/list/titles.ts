@@ -136,6 +136,16 @@ export interface TitleMatch {
   rank: number;
 }
 
+/** Every dictionary title — used as the server-side jobTitles filter for
+ * GetLeads enrichment so we only pull ICP-shaped people at a domain. */
+export function allDictionaryTitles(): string[] {
+  const out: string[] = [];
+  for (const module of Object.keys(DICTIONARY) as ModuleSegment[]) {
+    for (const tier of DICTIONARY[module]) out.push(...tier.titles);
+  }
+  return out;
+}
+
 /** Best (lowest-rank) module match for a raw title string, or null. */
 export function matchTitle(rawTitle: string): TitleMatch | null {
   const title = rawTitle.toLowerCase();

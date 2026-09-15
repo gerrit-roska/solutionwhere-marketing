@@ -164,6 +164,44 @@ export interface GuardrailAlertsTable {
   resolved_at: Date | null;
 }
 
+export interface AdsResourcesTable {
+  id: Generated<number>;
+  resource_type: string;
+  plan_key: string;
+  name: string;
+  resource_name: string | null;
+  status: Generated<string>;
+  detail: unknown;
+  created_at: Generated<Date>;
+  updated_at: Generated<Date>;
+}
+
+export interface FbCreativesTable {
+  creative_id: string;
+  persona: string;
+  angle: string;
+  module: string;
+  format: string;
+  file_key: string | null;
+  headline: string | null;
+  primary_text: string | null;
+  fb_ad_id: string | null;
+  status: Generated<string>;
+  created_at: Generated<Date>;
+}
+
+export interface FbActionsTable {
+  id: Generated<number>;
+  run_date: Date | string;
+  ad_id: string | null;
+  creative_id: string | null;
+  action: string;
+  reason: string | null;
+  before: unknown;
+  after: unknown;
+  created_at: Generated<Date>;
+}
+
 // The single source of truth for table types — dashboard pages and jobs both
 // query through this. Add a row type per migration (plugins do this too).
 // (Applied migrations are tracked in kysely's own kysely_migration table,
@@ -180,6 +218,9 @@ export interface Database {
   rfp_signals: RfpSignalsTable;
   keyword_volumes: KeywordVolumesTable;
   guardrail_alerts: GuardrailAlertsTable;
+  ads_resources: AdsResourcesTable;
+  fb_creatives: FbCreativesTable;
+  fb_actions: FbActionsTable;
   seo_keywords: SeoKeywordsTable;
   seo_articles: SeoArticlesTable;
   seo_playbooks: SeoPlaybooksTable;

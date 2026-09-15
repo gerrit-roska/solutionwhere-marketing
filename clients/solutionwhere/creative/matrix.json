@@ -1,0 +1,68 @@
+{
+  "source": "docs/04-meta-ads-execution.md §3–§5",
+  "note": "6 personas × 8 angles. Hooks are ICP-derived hypotheses (04 §3) — replace with verbatim sales-call language when transcripts land. A8 is the product-demo angle: no hook, static format only, the screenshot carries it.",
+  "landingBase": "https://home.solutionwhere.com",
+  "personas": {
+    "P1": { "name": "PD Director / Coordinator", "module": "pd", "landing": "/professional-development?module=pd", "pain": "I have three spreadsheets and a Google Form and the state report takes a week", "proof": "80% less registration admin; Act 48 / SCECH / CTLE reporting on demand; since 1996, never acquired" },
+    "P2": { "name": "Registrar / Director of Student Services", "module": "enrollments", "landing": "/enrollments?module=enrollments", "pain": "Paper packets in a filing cabinet and a lottery someone runs in Excel", "proof": "Families register from a phone in their language; seeded, re-runnable lottery with audit trail" },
+    "P3": { "name": "Curriculum & Instruction Director / Coaching Coordinator", "module": "coaching", "landing": "/coaching?module=coaching", "pain": "My coaches are doing the work and I can't show it happened", "proof": "Offline tablet logging from the classroom; planned vs. delivered by site; non-evaluative, educator data only" },
+    "P4": { "name": "CCR&R Executive Director / Program Director", "module": "referrals", "landing": "/referrals?module=referrals", "pain": "Intake in one place, providers in another, referral history in a spreadsheet", "proof": "One system; funder report generated from operational data; On Track by 5 / LPSS reference" },
+    "P5": { "name": "Superintendent / Executive Director", "module": "all", "landing": "/platform", "pain": "What happens to our data, and who do I call", "proof": "33+ states since 1996; FERPA and security pages; a published phone number answered by certified staff" },
+    "P6": { "name": "CourseWhere / legacy Wisdomwhere admin", "module": "pd", "landing": "/coursewhere", "pain": "We've been on this since 2009 and nobody knows how it works anymore", "proof": "Documented upgrade path, data migrated by us, same company" }
+  },
+  "rows": [
+    { "creative_id": "P1-A1-v1", "persona": "P1", "angle": "A1", "hook": "Registration season shouldn't cost your team six weeks.", "formats": ["video", "static"] },
+    { "creative_id": "P1-A2-v1", "persona": "P1", "angle": "A2", "hook": "When PDE asks for Act 48 hours, is the answer a button or a project?", "formats": ["video", "static"] },
+    { "creative_id": "P1-A3-v1", "persona": "P1", "angle": "A3", "hook": "Lyons Township has run PD registration on this for years.", "formats": ["video", "static"] },
+    { "creative_id": "P1-A4-v1", "persona": "P1", "angle": "A4", "hook": "Frontline bought MyLearningPlan. We've been the same company for 30 years.", "formats": ["video", "static"] },
+    { "creative_id": "P1-A5-v1", "persona": "P1", "angle": "A5", "hook": "You don't need a platform commitment. You need registration to work by August.", "formats": ["video", "static"] },
+    { "creative_id": "P1-A6-v1", "persona": "P1", "angle": "A6", "hook": "231-935-3000. A certified specialist answers. That's the whole pitch.", "formats": ["video", "static"] },
+    { "creative_id": "P1-A7-v1", "persona": "P1", "angle": "A7", "hook": "Still tracking PD in spreadsheets? Moving off them is a week, not a quarter.", "formats": ["video", "static"] },
+    { "creative_id": "P1-A8-v1", "persona": "P1", "angle": "A8", "hook": "", "formats": ["static"] },
+
+    { "creative_id": "P2-A1-v1", "persona": "P2", "angle": "A1", "hook": "Registration season is six weeks of paper. It doesn't have to be.", "formats": ["video", "static"] },
+    { "creative_id": "P2-A2-v1", "persona": "P2", "angle": "A2", "hook": "When the board questions the lottery, can you rerun the exact draw in front of them?", "formats": ["video", "static"] },
+    { "creative_id": "P2-A3-v1", "persona": "P2", "angle": "A3", "hook": "Districts your size moved registration online without adding staff.", "formats": ["video", "static"] },
+    { "creative_id": "P2-A4-v1", "persona": "P2", "angle": "A4", "hook": "Your SIS keeps getting acquired. Your enrollment process shouldn't notice.", "formats": ["video", "static"] },
+    { "creative_id": "P2-A5-v1", "persona": "P2", "angle": "A5", "hook": "You don't need a new SIS. You need registration that works by August.", "formats": ["video", "static"] },
+    { "creative_id": "P2-A6-v1", "persona": "P2", "angle": "A6", "hook": "When a parent calls on deadline day, a person should answer. Same for you.", "formats": ["video", "static"] },
+    { "creative_id": "P2-A7-v1", "persona": "P2", "angle": "A7", "hook": "Still running the lottery in Excel? The audit trail alone is worth the move.", "formats": ["video", "static"] },
+    { "creative_id": "P2-A8-v1", "persona": "P2", "angle": "A8", "hook": "", "formats": ["static"] },
+
+    { "creative_id": "P3-A1-v1", "persona": "P3", "angle": "A1", "hook": "Your coaches coach. The paperwork afterward eats the afternoon.", "formats": ["video", "static"] },
+    { "creative_id": "P3-A2-v1", "persona": "P3", "angle": "A2", "hook": "When the state asks what coaching actually happened, is the answer a report or a scramble?", "formats": ["video", "static"] },
+    { "creative_id": "P3-A3-v1", "persona": "P3", "angle": "A3", "hook": "The agencies running real coaching programs can prove every visit. Here's how.", "formats": ["video", "static"] },
+    { "creative_id": "P3-A4-v1", "persona": "P3", "angle": "A4", "hook": "Coaching platforms keep getting rolled into suites. This one stays independent.", "formats": ["video", "static"] },
+    { "creative_id": "P3-A5-v1", "persona": "P3", "angle": "A5", "hook": "You don't need an evaluation suite. You need coaching logs that fill themselves.", "formats": ["video", "static"] },
+    { "creative_id": "P3-A6-v1", "persona": "P3", "angle": "A6", "hook": "Your coaches won't log anything clunky. Ours works offline, from the classroom.", "formats": ["video", "static"] },
+    { "creative_id": "P3-A7-v1", "persona": "P3", "angle": "A7", "hook": "Still documenting coaching in a shared drive? There's a cleaner path.", "formats": ["video", "static"] },
+    { "creative_id": "P3-A8-v1", "persona": "P3", "angle": "A8", "hook": "", "formats": ["static"] },
+
+    { "creative_id": "P4-A1-v1", "persona": "P4", "angle": "A1", "hook": "The quarterly state report takes your team a week. It should take an hour.", "formats": ["video", "static"] },
+    { "creative_id": "P4-A2-v1", "persona": "P4", "angle": "A2", "hook": "Funder reporting from four systems means the numbers never quite match.", "formats": ["video", "static"] },
+    { "creative_id": "P4-A3-v1", "persona": "P4", "angle": "A3", "hook": "On Track by 5 runs referrals on one system. Their report writes itself.", "formats": ["video", "static"] },
+    { "creative_id": "P4-A4-v1", "persona": "P4", "angle": "A4", "hook": "Fifteen years on the same legacy tool isn't loyalty. It's inertia.", "formats": ["video", "static"] },
+    { "creative_id": "P4-A5-v1", "persona": "P4", "angle": "A5", "hook": "You don't need to replace everything. Intake to outcome, one system.", "formats": ["video", "static"] },
+    { "creative_id": "P4-A6-v1", "persona": "P4", "angle": "A6", "hook": "When the state calls with a question, you need an answer — not a ticket number.", "formats": ["video", "static"] },
+    { "creative_id": "P4-A7-v1", "persona": "P4", "angle": "A7", "hook": "Leaving a 15-year-old system sounds worse than staying. It isn't.", "formats": ["video", "static"] },
+    { "creative_id": "P4-A8-v1", "persona": "P4", "angle": "A8", "hook": "", "formats": ["static"] },
+
+    { "creative_id": "P5-A1-v1", "persona": "P5", "angle": "A1", "hook": "Your staff hours go to process, not students. That's a choice.", "formats": ["video", "static"] },
+    { "creative_id": "P5-A2-v1", "persona": "P5", "angle": "A2", "hook": "FERPA, state audits, board questions. One platform, documented answers.", "formats": ["video", "static"] },
+    { "creative_id": "P5-A3-v1", "persona": "P5", "angle": "A3", "hook": "Agencies in 33 states run on this. Including ones your size.", "formats": ["video", "static"] },
+    { "creative_id": "P5-A4-v1", "persona": "P5", "angle": "A4", "hook": "Since 1996. Never acquired. The contract you sign is the company you keep.", "formats": ["video", "static"] },
+    { "creative_id": "P5-A5-v1", "persona": "P5", "angle": "A5", "hook": "Buy the module that solves this year's problem. Add the rest when ready.", "formats": ["video", "static"] },
+    { "creative_id": "P5-A6-v1", "persona": "P5", "angle": "A6", "hook": "A published phone number, answered by certified staff. That's the support model.", "formats": ["video", "static"] },
+    { "creative_id": "P5-A7-v1", "persona": "P5", "angle": "A7", "hook": "Vendor consolidation broke your stack. Migration here is documented and done for you.", "formats": ["video", "static"] },
+    { "creative_id": "P5-A8-v1", "persona": "P5", "angle": "A8", "hook": "", "formats": ["static"] },
+
+    { "creative_id": "P6-A1-v1", "persona": "P6", "angle": "A1", "hook": "Every semester on the old system costs more hours than the move would.", "formats": ["video", "static"] },
+    { "creative_id": "P6-A2-v1", "persona": "P6", "angle": "A2", "hook": "When the system nobody understands finally breaks, what's the plan?", "formats": ["video", "static"] },
+    { "creative_id": "P6-A3-v1", "persona": "P6", "angle": "A3", "hook": "Agencies have moved off CourseWhere with their data intact. Here's the path.", "formats": ["video", "static"] },
+    { "creative_id": "P6-A4-v1", "persona": "P6", "angle": "A4", "hook": "Same company since 1996. The upgrade isn't a switch — it's a continuation.", "formats": ["video", "static"] },
+    { "creative_id": "P6-A5-v1", "persona": "P6", "angle": "A5", "hook": "You already own the PD side. Upgrading it is not a new procurement.", "formats": ["video", "static"] },
+    { "creative_id": "P6-A6-v1", "persona": "P6", "angle": "A6", "hook": "The people who built CourseWhere answer the phone at Solutionwhere.", "formats": ["video", "static"] },
+    { "creative_id": "P6-A7-v1", "persona": "P6", "angle": "A7", "hook": "Still on CourseWhere? The upgrade path is documented and we move the data.", "formats": ["video", "static"] },
+    { "creative_id": "P6-A8-v1", "persona": "P6", "angle": "A8", "hook": "", "formats": ["static"] }
+  ]
+}

@@ -47,6 +47,38 @@ export async function putText(
   );
 }
 
+export async function putBytes(
+  key: string,
+  body: Uint8Array,
+  contentType: string,
+): Promise<void> {
+  const { client, bucket } = s3();
+  await client.send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+    }),
+  );
+}
+
+export async function getBytes(key: string): Promise<Uint8Array | null> {
+  const { client, bucket } = s3();
+  try {
+    const response = await client.send(
+      new GetObjectCommand({ Bucket: bucket, Key: key }),
+    );
+    const chunks: Uint8Array[] = [];
+    for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
+      chunks.push(chunk);
+    }
+    return Buffer.concat(chunks);
+  } catch {
+    return null;
+  }
+}
+
 export async function presignGet(
   key: string,
   seconds = 3600,

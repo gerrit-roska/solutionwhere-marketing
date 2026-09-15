@@ -9,7 +9,9 @@
     "job:verify-emails-daily": "tsx src/verify-emails-daily.ts",
     "job:aeo-panel-monthly": "tsx src/aeo-panel-monthly.ts",
     "job:rfp-watch-daily": "tsx src/rfp-watch-daily.ts",
-    "job:keyword-refresh-quarterly": "tsx src/keyword-refresh-quarterly.ts"
+    "job:keyword-refresh-quarterly": "tsx src/keyword-refresh-quarterly.ts",
+    "job:google-ads-daily": "tsx src/google-ads-daily.ts",
+    "job:fb-creative-factory-weekly": "tsx src/fb-creative-factory-weekly.ts"
   },
   "dependencies": {
     "@app/core": "*"

@@ -1,0 +1,17 @@
+{
+  "avatar": {
+    "engine": "heygen:videos.avatar_iv",
+    "avatarId": "938fe631f5b04423b89d015f82f4b5af",
+    "voiceId": "2972064a039c4402a568b3d2c798fe5a",
+    "note": "Dante Office 1 — see docs/RESEARCH.md. Upgrade path: a digital twin of a real Solutionwhere persona, client-optional."
+  },
+  "statics": {
+    "model": "kie:nano-banana-2",
+    "aspectRatio": "1:1",
+    "resolution": "1K",
+    "referenceDir": "clients/fb/assets/reference_image/product_images",
+    "note": "get_built pattern: img2img remix of real product screenshots, rotated per asset. Client-supplied Wisdomwhere UI shots drop into the same folder and take over via rotation."
+  },
+  "videoSeconds": 30,
+  "reviewBatch": { "videos": 3, "statics": 2 }
+}
