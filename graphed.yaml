@@ -24,65 +24,48 @@ services:
 
 # All crons PAUSED during client onboarding (2026-09-15). Deletion is the
 # only real off switch — run one-offs with `graphed dev run -- npm run job:<name>`.
-# Re-enable blocks below once tracking + suppression list land.
-jobs:
-  # SEO drafting cron is PAUSED until the publishing connection/decision lands.
-  #   seo-publish-daily:
-  #     command: npm run job:seo-publish-daily
-  #     schedule: { cron: 0 12 * * 1-5, timezone: America/New_York }
-  #     retries: 0
-  #     timeout_seconds: 1800
-
-  # Named-account list pipeline (NCES / AESA / staff directories).
-  # list-build-nightly:
-  #   command: npm run job:list-build-nightly
-  #   schedule:
-  #     cron: 0 3 * * *
-  #     timezone: America/New_York
-  #   retries: 0
-  #   timeout_seconds: 7200
-
-  # Million Verifier bulk verification with the 2% bounce circuit-breaker.
-  # verify-emails-daily:
-  #   command: npm run job:verify-emails-daily
-  #   schedule:
-  #     cron: 0 5 * * *
-  #     timezone: America/New_York
-  #   retries: 0
-  #   timeout_seconds: 3600
-
-  # AEO prompt panel: 20 prompts x 4 models monthly.
-  # aeo-panel-monthly:
-  #   command: npm run job:aeo-panel-monthly
-  #   schedule:
-  #     cron: 0 8 1 * *
-  #     timezone: America/New_York
-  #   retries: 1
-  #   timeout_seconds: 3600
-
-  # Procurement watch over curated state portals.
-  # rfp-watch-daily:
-  #   command: npm run job:rfp-watch-daily
-  #   schedule:
-  #     cron: 0 6 * * 1-5
-  #     timezone: America/New_York
-  #   retries: 1
-  #   timeout_seconds: 1800
-
-  # Keyword volume refresh via Graphed Tools (dataforseo).
-  # keyword-refresh-quarterly:
-  #   command: npm run job:keyword-refresh-quarterly
-  #   schedule:
-  #     cron: 0 9 1 1,4,7,10 *
-  #     timezone: America/New_York
-  #   retries: 0
-  #   timeout_seconds: 1800
-
-  # Meta Andromeda creative factory (HeyGen + Kie). Billed per render.
-  # fb-creative-factory-weekly:
-  #   command: npm run job:fb-creative-factory-weekly
-  #   schedule:
-  #     cron: 0 6 * * 1
-  #     timezone: America/New_York
-  #   retries: 0
-  #   timeout_seconds: 14400
+# Re-enable by replacing `jobs: {}` with uncommented blocks below.
+#
+# SEO drafting cron:
+#   seo-publish-daily:
+#     command: npm run job:seo-publish-daily
+#     schedule: { cron: 0 12 * * 1-5, timezone: America/New_York }
+#     retries: 0
+#     timeout_seconds: 1800
+#
+# list-build-nightly:
+#   command: npm run job:list-build-nightly
+#   schedule: { cron: 0 3 * * *, timezone: America/New_York }
+#   retries: 0
+#   timeout_seconds: 7200
+#
+# verify-emails-daily:
+#   command: npm run job:verify-emails-daily
+#   schedule: { cron: 0 5 * * *, timezone: America/New_York }
+#   retries: 0
+#   timeout_seconds: 3600
+#
+# aeo-panel-monthly:
+#   command: npm run job:aeo-panel-monthly
+#   schedule: { cron: 0 8 1 * *, timezone: America/New_York }
+#   retries: 1
+#   timeout_seconds: 3600
+#
+# rfp-watch-daily:
+#   command: npm run job:rfp-watch-daily
+#   schedule: { cron: 0 6 * * 1-5, timezone: America/New_York }
+#   retries: 1
+#   timeout_seconds: 1800
+#
+# keyword-refresh-quarterly:
+#   command: npm run job:keyword-refresh-quarterly
+#   schedule: { cron: 0 9 1 1,4,7,10 *, timezone: America/New_York }
+#   retries: 0
+#   timeout_seconds: 1800
+#
+# fb-creative-factory-weekly:
+#   command: npm run job:fb-creative-factory-weekly
+#   schedule: { cron: 0 6 * * 1, timezone: America/New_York }
+#   retries: 0
+#   timeout_seconds: 14400
+jobs: {}
