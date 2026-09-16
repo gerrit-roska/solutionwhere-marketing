@@ -87,11 +87,13 @@ export default async function AdsPage() {
               Credentials live on the job, not the dashboard
             </CardTitle>
             <CardDescription>
-              API access is provisioned — all four GOOGLE_ADS_* secrets are
-              set in Graphed (2026-09-16). This dashboard environment does not
-              hold them, so the plan below validates locally; the
-              google-ads-daily job reconciles validate-only against the live
-              account, and nothing applies without an explicit --apply.
+              API access is live — the MCC link was accepted 2026-09-16 and
+              the service account reads/writes the account (no developer
+              token; Google sunset them 2026-09-09). The secrets sit on the
+              job environment, not this dashboard, so this page renders the
+              plan and the ledger. The account structure — 8 campaigns, 43 ad
+              groups, 301 keywords, 6 negative lists, conversion actions —
+              was built via API on 2026-09-16, all PAUSED.
             </CardDescription>
           </CardHeader>
         </Card>

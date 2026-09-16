@@ -201,17 +201,15 @@ export async function suggestGeoTargets(
 ): Promise<Map<string, string>> {
   const env = googleAdsEnv();
   spendOperations(1);
-  const res = await fetch(
-    `${BASE}/customers/${customerId(env)}/geoTargetConstants:suggest`,
-    {
-      method: "POST",
-      headers: await headers(env),
-      body: JSON.stringify({
-        locationNames: { names },
-        geoTargets: { geoTargetConstants: [] },
-      }),
-    },
-  );
+  // GeoTargetConstantService is a global endpoint — not customer-scoped.
+  const res = await fetch(`${BASE}/geoTargetConstants:suggest`, {
+    method: "POST",
+    headers: await headers(env),
+    body: JSON.stringify({
+      // oneof query: locationNames OR geoTargets — never both.
+      locationNames: { names },
+    }),
+  });
   const text = await res.text();
   if (!res.ok) {
     throw asQuotaError(res.status, text) ?? new Error(`geoSuggest ${res.status}: ${text}`);
@@ -242,7 +240,9 @@ export const rn = {
   asset: (cid: string, id: string | number) => `customers/${cid}/assets/${id}`,
 };
 
-export const toMicros = (usd: number): number => Math.round(usd * 1_000_000);
+export const toMicros = (usd: number): number =>
+  // Google requires money micros to be a multiple of 10,000 ($0.01).
+  Math.round((usd * 1_000_000) / 10_000) * 10_000;
 export const fromMicros = (m: number | string): number => Number(m) / 1_000_000;
 
 export const normalize = (s: string): string =>
