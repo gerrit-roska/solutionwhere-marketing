@@ -1,5 +1,9 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { getDb } from "@app/core";
+import { projectRoot } from "@app/core/config";
 import { warehouseConfig } from "@app/core/marketing/config";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -28,6 +32,30 @@ interface CoverageRow {
   accounts: number;
   with_contact: number;
   sequenced: number;
+}
+
+interface SequenceStep {
+  day: number;
+  subject: string;
+  body: string;
+}
+
+interface Sequence {
+  id: string;
+  name: string;
+  module: string;
+  steps: SequenceStep[];
+}
+
+function loadSequences(): Sequence[] {
+  try {
+    const raw = JSON.parse(
+      readFileSync(join(projectRoot(), "data/sequences.json"), "utf-8"),
+    ) as { sequences?: Sequence[] };
+    return raw.sequences ?? [];
+  } catch {
+    return [];
+  }
 }
 
 async function load(): Promise<CoverageRow[] | { error: string }> {
@@ -70,8 +98,22 @@ async function load(): Promise<CoverageRow[] | { error: string }> {
   }
 }
 
+async function loadSuppressions(): Promise<number> {
+  try {
+    const row = await getDb()
+      .selectFrom("suppression_domains")
+      .select((eb) => eb.fn.countAll().as("total"))
+      .executeTakeFirstOrThrow();
+    return Number(row.total);
+  } catch {
+    return 0;
+  }
+}
+
 export default async function EmailPage() {
   const data = await load();
+  const suppressions = await loadSuppressions();
+  const sequences = loadSequences();
   const instantlyConnected = Boolean(warehouseConfig().instantly);
 
   return (
@@ -82,6 +124,43 @@ export default async function EmailPage() {
           Named-account coverage by state and tier. Sending is gated on
           domains warming, the suppression list, and explicit approval.
         </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Suppression list</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-semibold tabular-nums">
+              {suppressions}
+              <span className="ml-2 text-sm text-muted-foreground">
+                domains
+              </span>
+            </div>
+            {suppressions === 0 ? (
+              <p className="mt-1 text-xs text-amber-700">
+                Nothing sends until the customer suppression list is loaded
+                (06 §1).
+              </p>
+            ) : null}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Sequencer</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-semibold">
+              {instantlyConnected ? "Connected" : "Not connected"}
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {instantlyConnected
+                ? "Instantly source live — campaign analytics below."
+                : "Instantly/Smartlead account is a client checklist item."}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {!instantlyConnected && (
@@ -96,6 +175,41 @@ export default async function EmailPage() {
           </CardHeader>
         </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Sequences</CardTitle>
+          <CardDescription>
+            The five 06 §6 sequences, plain text, no tracking pixel, no link
+            in email 1 (06 §5.4).
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {sequences.map((sequence) => (
+            <details key={sequence.id} className="group rounded-md border">
+              <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
+                <Badge variant="secondary">{sequence.module}</Badge>
+                {sequence.name}
+                <span className="ml-auto text-xs text-muted-foreground group-open:rotate-180">
+                  {sequence.steps.length} steps ▾
+                </span>
+              </summary>
+              <div className="space-y-3 border-t px-4 py-3">
+                {sequence.steps.map((step) => (
+                  <div key={step.day}>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Day {step.day} — {step.subject}
+                    </p>
+                    <p className="mt-1 whitespace-pre-wrap text-sm text-foreground/80">
+                      {step.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </details>
+          ))}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

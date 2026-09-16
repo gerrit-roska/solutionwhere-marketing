@@ -1,14 +1,14 @@
 {
-  "ga4": "",
-  "searchConsole": "",
-  "googleAds": "",
-  "metaAds": "",
+  "ga4": "ga4_rouqle",
+  "searchConsole": "search_xeyd6x",
+  "googleAds": "google_ads_y9pi36",
+  "metaAds": "fb_ads_3pi2ic",
   "crm": "",
   "instantly": "",
   "demoEventName": "demo_request",
   "notes": {
-    "fb_ads_gptex9": "DO NOT USE — George Shapiro's PERSONAL ad account, connected 2026-08-28. Replace metaAds with the schema of the Solutionwhere business ad account source once it exists (FDE-527).",
-    "googleAds": "Access granted (Customer ID 202-304-8623) but the warehouse source is not connected yet (FDE-526).",
+    "metaAds": "Warehouse connected 2026-09-16. Solutionwhere - Primary, act 1094729323030580, USD, US/Eastern. Replaced George Shapiro personal source fb_ads_gptex9 (FDE-527).",
+    "googleAds": "Warehouse connected 2026-09-15. Customer ID 202-304-8623. API write: SA ads-agent@temporal-loop-508721-n9 on Graphed MCC 553-823-3519.",
     "crm": "CRM undetermined — in-house per Aug 19 kickoff notes, HubSpot per spec. Resolve via FDE-528 before wiring offline conversions."
   }
 }

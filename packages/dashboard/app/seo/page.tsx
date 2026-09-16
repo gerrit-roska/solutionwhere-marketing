@@ -111,6 +111,22 @@ async function loadQueue(): Promise<QueueRow[] | { error: string }> {
   }
 }
 
+async function loadQueueCounts(): Promise<{ status: string; total: number }[]> {
+  try {
+    const rows = await getDb()
+      .selectFrom("seo_keywords")
+      .select((eb) => ["status", eb.fn.countAll().as("total")])
+      .groupBy("status")
+      .execute();
+    return rows.map((row) => ({
+      status: String(row.status),
+      total: Number(row.total),
+    }));
+  } catch {
+    return [];
+  }
+}
+
 async function loadArticle(id: number): Promise<ArticleView | null> {
   const row = await getDb()
     .selectFrom("seo_articles")
@@ -166,6 +182,8 @@ export default async function SeoPage({
     ? (searchParams.tab as SeoTab)
     : "queue";
   const queue = tab === "queue" ? await loadQueue() : [];
+  const queueCounts = tab === "queue" ? await loadQueueCounts() : [];
+  const queueTotal = queueCounts.reduce((sum, row) => sum + row.total, 0);
   // Metrics are best-effort: a warehouse outage must not break the console —
   // but surface the real error so cloud misconfiguration is debuggable
   // instead of masked as missing credentials.
@@ -197,26 +215,42 @@ export default async function SeoPage({
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">SEO</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Keyword queue and generated articles. The seo-publish-daily job
-            takes one keyword per run.
+            {queueTotal} keywords queued. The seo-publish-daily job takes one
+            keyword per run.
           </p>
         </div>
-        <nav className="inline-flex items-center gap-1 rounded-md bg-muted p-1">
-          {TABS.map((t) => (
-            <Link
-              key={t.key}
-              href={t.key === "queue" ? "/seo" : `/seo?tab=${t.key}`}
-              className={
-                t.key === tab
-                  ? "rounded-sm bg-background px-3 py-1 text-xs font-medium shadow-sm"
-                  : "rounded-sm px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
-              }
-            >
-              {t.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <a href="/seo/export">Export drafts</a>
+          </Button>
+          <nav className="inline-flex items-center gap-1 rounded-md bg-muted p-1">
+            {TABS.map((t) => (
+              <Link
+                key={t.key}
+                href={t.key === "queue" ? "/seo" : `/seo?tab=${t.key}`}
+                className={
+                  t.key === tab
+                    ? "rounded-sm bg-background px-3 py-1 text-xs font-medium shadow-sm"
+                    : "rounded-sm px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+                }
+              >
+                {t.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </div>
+
+      {tab === "queue" && queueCounts.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="default">{queueTotal} total</Badge>
+          {queueCounts.map((row) => (
+            <Badge key={row.status} variant="secondary">
+              {row.total} {row.status}
+            </Badge>
+          ))}
+        </div>
+      ) : null}
 
       {searchParams.error ? (
         <Banner tone="error" message={searchParams.error} />
