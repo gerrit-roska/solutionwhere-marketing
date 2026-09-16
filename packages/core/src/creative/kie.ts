@@ -57,17 +57,23 @@ export async function renderImage(
   input: KieImageInput,
   timeoutSeconds = 300,
 ): Promise<string> {
+  const toolId = model.startsWith("kie:") ? model : `kie:${model}`;
+  // Kie field names differ by model: Nano Banana takes `image_input` and
+  // `output_format`; GPT Image 2 takes `input_urls` (required for the
+  // image-to-image tool) and has no `output_format`.
+  const gptImage2 = toolId.includes("gpt-image-2");
   const body: Record<string, unknown> = { prompt: input.prompt };
-  if (input.imageInput?.length) body.image_input = input.imageInput;
+  if (input.imageInput?.length) {
+    body[gptImage2 ? "input_urls" : "image_input"] = input.imageInput;
+  }
   if (input.aspectRatio) body.aspect_ratio = input.aspectRatio;
   if (input.resolution) body.resolution = input.resolution;
-  if (input.outputFormat) body.output_format = input.outputFormat;
+  if (input.outputFormat && !gptImage2) body.output_format = input.outputFormat;
 
-  const raw = await graphed.tools.run(
-    model.startsWith("kie:") ? model : `kie:${model}`,
-    body,
-    { timeoutSeconds, pollMs: 5_000 },
-  );
+  const raw = await graphed.tools.run(toolId, body, {
+    timeoutSeconds,
+    pollMs: 5_000,
+  });
   const url = extractKieUrls(raw)[0];
   if (!url) {
     throw new Error(
