@@ -1,0 +1,27 @@
+{
+  "pixelId": "1055542907381574",
+  "apiVersion": "v23.0",
+  "apiVersionNote": "Single constant to bump when Meta deprecates a version; versions are supported ~2 years.",
+  "tokenIssuedAt": "2026-09-16",
+  "tokenNote": "System-user token with ads_management + ads_read, created 2026-09-16 (02 §Meta). Meta tokens expire ~60 days; fb-manage-daily alerts at day 50 (04 §1 item 6).",
+  "urlTags": "utm_source=facebook&utm_medium=paid_social&utm_campaign={{campaign.name}}&utm_content={{ad.name}}",
+  "campaign": {
+    "name": "CAMP 01 | Andromeda",
+    "objective": "OUTCOME_SALES",
+    "optimizationEvent": "LEAD",
+    "optimizationNote": "04 §2.1: optimize on Lead at launch; fb-manage-daily flips ad sets to the qualified_demo custom conversion once one has >= 25 qualified_demo events / 30 days.",
+    "flipToCustomConversion": "qualified_demo",
+    "dailyBudgetPerAdSetUsd": 12.5,
+    "budgetNote": "04 §8: CAMP 01 goes live at $50/day (Oct 2026) = 4 module ad sets x $12.50. Budgets live at ad-set level (04 §6); fb-manage-daily never raises the account total more than 30%/day.",
+    "geoCountries": ["US"],
+    "excludedCustomAudienceIds": [],
+    "exclusionsNote": "04 §6: EXCL_InstalledBase / EXCL_Customers / EXCL_Employees / EXCL_Converted_365 on every ad set before anything goes ACTIVE. The audiences do not exist yet (pixel live 2026-09-16); ads-guardrails-daily's meta-targeting-exclusions critical check is the backstop. Add the audience ids here once built.",
+    "adSetsByModule": {
+      "pd": "AS 01 | Broad - PD",
+      "enrollments": "AS 02 | Broad - Enrollments",
+      "coaching": "AS 03 | Broad - Coaching",
+      "referrals": "AS 04 | Broad - Referrals"
+    },
+    "adSetsNote": "04 §6: one broad Advantage+ ad set per module; ads within it span all personas. Persona P5 has module 'all' in matrix.json — no ad set is mapped for it, so P5 creatives are skipped and alerted until a human decides where platform-wide ads live."
+  }
+}
