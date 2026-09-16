@@ -74,9 +74,10 @@ export async function getAccessToken(
 }
 
 async function headers(env: GoogleAdsEnv): Promise<Record<string, string>> {
+  // No developer-token header: sunset 2026-09-09, ignored by the API and
+  // rejected by a future version. Access level comes from the Cloud project.
   return {
     Authorization: `Bearer ${await getAccessToken(env)}`,
-    "developer-token": env.GOOGLE_ADS_DEVELOPER_TOKEN ?? "",
     "login-customer-id": loginCustomerId(env),
     "Content-Type": "application/json",
   };
