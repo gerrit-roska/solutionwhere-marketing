@@ -7,7 +7,7 @@ import {
   observedPattern,
   type Pattern,
 } from "./patterns";
-import { recordRun, sleep } from "./shared";
+import { emailDomain, recordRun, sleep, suppressedDomains } from "./shared";
 
 // GetLeads enrichment (06 §3.5): the fallback for accounts whose staff
 // directory yielded nothing — in practice most district directories are
@@ -128,6 +128,21 @@ export async function runGetleadsEnrichment(
         ? [observed]
         : ["first.last", "first"];
 
+      // 07 §4.2: one suppression lookup per account, covering the account
+      // domain and any email domain GetLeads returned. Matches are written
+      // suppressed = true, never dropped.
+      const suppressed = await suppressedDomains([
+        account.domain,
+        ...rows.map((row) => emailDomain(contactFields(row).email)),
+      ]);
+      const isSuppressed = (email: string | null): boolean => {
+        const d = emailDomain(email);
+        return (
+          (account.domain != null && suppressed.has(account.domain)) ||
+          (d != null && suppressed.has(d))
+        );
+      };
+
       for (const row of rows) {
         if (imported >= MAX_PER_ACCOUNT) break;
         const c = contactFields(row);
@@ -169,6 +184,7 @@ export async function runGetleadsEnrichment(
                 email,
                 email_source: source,
                 linkedin_url: c.linkedin,
+                suppressed: isSuppressed(email),
               })
               .onConflict((oc) => oc.doNothing())
               .executeTakeFirst();
