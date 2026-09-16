@@ -12,5 +12,8 @@
   },
   "cms": {
     "type": "none"
+  },
+  "metrics": {
+    "searchConsoleSchema": "search_xeyd6x"
   }
 }

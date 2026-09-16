@@ -48,7 +48,12 @@ async function load(): Promise<{
       .orderBy("run_date", "desc")
       .execute();
     const summary = rows.map((row) => ({
-      run_date: String(row.run_date).slice(0, 10),
+      // pg returns DATE as a JS Date; String(Date).slice(0,10) yields
+      // "Wed Sep 16", which Postgres then rejects on the detail query.
+      run_date:
+        row.run_date instanceof Date
+          ? row.run_date.toISOString().slice(0, 10)
+          : String(row.run_date).slice(0, 10),
       model: row.model,
       mentioned: Number(row.mentioned ?? 0),
       cited: Number(row.cited ?? 0),

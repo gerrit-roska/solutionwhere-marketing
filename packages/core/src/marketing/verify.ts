@@ -1,4 +1,5 @@
 import { sql } from "kysely";
+import { GraphedApiError } from "@graphed-inc/sdk";
 import { getDb } from "../db";
 import { graphed } from "./graphed";
 import { presignGet, putText } from "./storage";
@@ -65,7 +66,9 @@ export async function run(): Promise<void> {
 
   const key = `mv/${new Date().toISOString().slice(0, 10)}-${Date.now()}.csv`;
   await putText(key, due.map((row) => row.email).join("\n"), "text/plain");
-  const url = await presignGet(key, 7200);
+  // The storage proxy rejects presigned URLs with expiry over 1h — MV
+  // downloads as soon as the run starts, so 3600 is ample.
+  const url = await presignGet(key, 3600);
 
   const batch = await db
     .insertInto("verification_batches")
@@ -84,15 +87,37 @@ export async function run(): Promise<void> {
     .execute();
 
   await graphed.tools.wait(started.id, { timeoutSeconds: 3000 });
-  const csv = (await graphed.tools.downloadResult(started.id)) as unknown;
-  const csvText =
-    typeof csv === "string" ? csv : Buffer.isBuffer(csv) ? csv.toString("utf-8") : String(csv);
+  // MV's report is CSV, but the SDK's downloadResult JSON-parses and throws
+  // INVALID_RESULT with the raw text on `body` — for this tool that throw
+  // IS the success path.
+  let csvText: string;
+  try {
+    const csv = (await graphed.tools.downloadResult(started.id)) as unknown;
+    csvText =
+      typeof csv === "string" ? csv : Buffer.isBuffer(csv) ? csv.toString("utf-8") : String(csv);
+  } catch (error) {
+    if (
+      error instanceof GraphedApiError &&
+      error.code === "INVALID_RESULT" &&
+      typeof error.body === "string"
+    ) {
+      csvText = error.body;
+    } else {
+      throw error;
+    }
+  }
 
   // Report CSV: header row with `email` and a result/quality column.
+  // MV reports both `quality` (good/risky/bad) and `result` (ok/catch_all/
+  // invalid/...) — the spec's send gate keys on result, so prefer it.
   const lines = csvText.split("\n").filter((line) => line.trim().length > 0);
   const header = (lines[0] ?? "").toLowerCase().split(",").map((h) => h.trim().replace(/"/g, ""));
   const emailIdx = header.findIndex((h) => h.includes("email"));
-  const statusIdx = header.findIndex((h) => h.includes("result") || h.includes("quality") || h.includes("status"));
+  const resultIdx = header.findIndex((h) => h === "result");
+  const statusIdx =
+    resultIdx >= 0
+      ? resultIdx
+      : header.findIndex((h) => h.includes("result") || h.includes("status"));
   let updated = 0;
   if (emailIdx >= 0 && statusIdx >= 0) {
     for (const line of lines.slice(1)) {

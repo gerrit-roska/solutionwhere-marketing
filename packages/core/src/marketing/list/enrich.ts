@@ -1,6 +1,12 @@
 import { getDb } from "../../db";
 import { graphed } from "../graphed";
 import { allDictionaryTitles, matchTitle } from "./titles";
+import {
+  buildEmail,
+  isCatchAllDomain,
+  observedPattern,
+  type Pattern,
+} from "./patterns";
 import { recordRun, sleep } from "./shared";
 
 // GetLeads enrichment (06 §3.5): the fallback for accounts whose staff
@@ -109,10 +115,23 @@ export async function runGetleadsEnrichment(
       }
 
       let imported = 0;
+      // §3.3 fallback state for this domain: never probe a catch-all, and
+      // prefer the pattern already observed in the account's directory.
+      const catchAll = account.domain
+        ? await isCatchAllDomain(account.domain)
+        : true;
+      const observed =
+        account.domain && !catchAll
+          ? await observedPattern(account.domain)
+          : null;
+      const patternCandidates: Pattern[] = observed
+        ? [observed]
+        : ["first.last", "first"];
+
       for (const row of rows) {
         if (imported >= MAX_PER_ACCOUNT) break;
         const c = contactFields(row);
-        if (!c.email || !c.title) continue;
+        if (!c.title) continue;
         const match = matchTitle(c.title);
         if (!match) continue;
         if (match.module === "referrals" && account.account_type !== "ccrr") {
@@ -120,28 +139,46 @@ export async function runGetleadsEnrichment(
         }
         // Only import contacts for modules the account actually fits.
         if (!account.modules_fit.includes(match.module)) continue;
-        try {
-          const result = await db
-            .insertInto("contacts")
-            .values({
-              account_id: account.account_id,
-              first_name: c.firstName,
-              last_name: c.lastName,
-              title: c.title.slice(0, 200),
-              title_rank: match.rank,
-              module_segment: match.module,
-              email: c.email,
-              email_source: "getleads",
-              linkedin_url: c.linkedin,
-            })
-            .onConflict((oc) => oc.doNothing())
-            .executeTakeFirst();
-          if (Number(result.numInsertedOrUpdatedRows ?? 0) > 0) {
-            imported += 1;
-            added += 1;
+
+        // GetLeads knows the person but sometimes not the address — infer
+        // it per §3.3 (max two probes; guesses stay mv_status NULL so the
+        // verify job remains the gate before anything is sendable).
+        const candidates: { email: string; source: string }[] = [];
+        if (c.email) {
+          candidates.push({ email: c.email, source: "getleads" });
+        } else if (c.firstName && c.lastName && account.domain && !catchAll) {
+          for (const pattern of patternCandidates) {
+            if (candidates.length >= 2) break;
+            const guess = buildEmail(pattern, c.firstName, c.lastName, account.domain);
+            if (guess) candidates.push({ email: guess, source: "pattern" });
           }
-        } catch {
-          // unique-email race; skip
+        }
+
+        for (const { email, source } of candidates) {
+          if (imported >= MAX_PER_ACCOUNT) break;
+          try {
+            const result = await db
+              .insertInto("contacts")
+              .values({
+                account_id: account.account_id,
+                first_name: c.firstName,
+                last_name: c.lastName,
+                title: c.title.slice(0, 200),
+                title_rank: match.rank,
+                module_segment: match.module,
+                email,
+                email_source: source,
+                linkedin_url: c.linkedin,
+              })
+              .onConflict((oc) => oc.doNothing())
+              .executeTakeFirst();
+            if (Number(result.numInsertedOrUpdatedRows ?? 0) > 0) {
+              imported += 1;
+              added += 1;
+            }
+          } catch {
+            // unique-email race; skip
+          }
         }
       }
       await sleep(250);

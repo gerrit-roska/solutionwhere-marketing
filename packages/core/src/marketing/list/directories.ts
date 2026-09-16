@@ -2,6 +2,12 @@ import * as cheerio from "cheerio";
 import { sql } from "kysely";
 import { getDb } from "../../db";
 import { matchTitle } from "./titles";
+import {
+  buildEmail,
+  isCatchAllDomain,
+  observedPattern,
+  type Pattern,
+} from "./patterns";
 import { CRAWL_USER_AGENT, recordRun, sleep } from "./shared";
 
 // Staff-directory extraction (06 §3.1): public agencies publish staff
@@ -27,6 +33,12 @@ interface FoundContact {
   name: string;
   title: string;
   email: string;
+}
+
+/** A title-matched directory row whose email is obfuscated (06 §3.1 step 5). */
+interface FoundPerson {
+  name: string;
+  title: string;
 }
 
 async function fetchOk(url: string): Promise<string | null> {
@@ -77,6 +89,41 @@ function extractContacts(html: string): FoundContact[] {
   return contacts;
 }
 
+/** Guards against building a guessed address from a department or title string. */
+function looksLikePersonName(name: string): boolean {
+  const words = name.split(" ").filter(Boolean);
+  if (words.length < 2 || words.length > 4) return false;
+  if (!/^[A-Za-z'’.-]+( [A-Za-z'’.-]+)+$/.test(name)) return false;
+  return !matchTitle(name);
+}
+
+/**
+ * Directory rows that match the title dictionary but expose no email —
+ * the §3.3 input set. The name is the first cell/emphasis element's text,
+ * which in directory markup is the person's name.
+ */
+function extractNameTitleOnly(html: string): FoundPerson[] {
+  const $ = cheerio.load(html);
+  const people: FoundPerson[] = [];
+  const rows = $("tr, li, .staff, .card, .member").toArray().slice(0, 4000);
+  for (const el of rows) {
+    const text = $(el).text().replace(/\s+/g, " ").trim();
+    if (text.length === 0 || text.length > 300) continue;
+    if (text.match(EMAIL_RE)) continue; // visible emails go through extractContacts
+    if (!matchTitle(text)) continue;
+    const name = $(el)
+      .find("td, th, strong, b, h3, h4, h5, span, p")
+      .first()
+      .text()
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 80);
+    if (!looksLikePersonName(name)) continue;
+    people.push({ name, title: text.slice(0, 200) });
+  }
+  return people;
+}
+
 export async function runDirectories(): Promise<void> {
   await recordRun("staff-directories", async () => {
     const db = getDb();
@@ -85,7 +132,7 @@ export async function runDirectories(): Promise<void> {
 
     const due = await db
       .selectFrom("accounts")
-      .select(["account_id", "account_name", "account_type", "website", "domain"])
+      .select(["account_id", "account_name", "account_type", "website", "domain", "modules_fit"])
       .where("suppressed", "=", false)
       .where("website", "is not", null)
       .where((eb) =>
@@ -104,12 +151,16 @@ export async function runDirectories(): Promise<void> {
         ? account.website!
         : `https://${account.website}`;
       let contacts: FoundContact[] = [];
+      let directoryHtml: string | null = null;
       for (const path of DIRECTORY_PATHS) {
         const html = await fetchOk(new URL(path, base).toString());
         await sleep(1000); // 1 req/domain/sec (06 §3.1)
         if (!html) continue;
         contacts = extractContacts(html);
-        if (contacts.length > 0) break;
+        if (contacts.length > 0) {
+          directoryHtml = html;
+          break;
+        }
       }
 
       for (const contact of contacts) {
@@ -138,6 +189,57 @@ export async function runDirectories(): Promise<void> {
           added += 1;
         } catch {
           // unique-email race; skip
+        }
+      }
+
+      // §3.1 step 5 → §3.3: rows where the email is obfuscated. One
+      // confirmed address in this domain's directory establishes the
+      // pattern for the whole agency; probe at most two patterns per
+      // person and never on a catch-all domain. Guesses stay mv_status
+      // NULL — verify-emails-daily is the gate before anything sends.
+      if (directoryHtml && account.domain) {
+        if (!(await isCatchAllDomain(account.domain))) {
+          const observed = await observedPattern(account.domain);
+          const candidates: Pattern[] = observed
+            ? [observed]
+            : ["first.last", "first"];
+          for (const person of extractNameTitleOnly(directoryHtml)) {
+            const match = matchTitle(person.title);
+            if (!match) continue;
+            if (match.module === "referrals" && account.account_type !== "ccrr") {
+              if (/executive director/i.test(person.title)) continue;
+            }
+            if (!account.modules_fit.includes(match.module)) continue;
+            const [firstName, ...rest] = person.name.split(" ");
+            const lastName = rest.join(" ");
+            if (!firstName || !lastName) continue;
+            let probed = 0;
+            for (const pattern of candidates) {
+              if (probed >= 2) break;
+              const email = buildEmail(pattern, firstName, lastName, account.domain);
+              if (!email) continue;
+              probed += 1;
+              try {
+                const result = await db
+                  .insertInto("contacts")
+                  .values({
+                    account_id: account.account_id,
+                    first_name: firstName,
+                    last_name: lastName,
+                    title: person.title.slice(0, 200),
+                    title_rank: match.rank,
+                    module_segment: match.module,
+                    email,
+                    email_source: "pattern",
+                  })
+                  .onConflict((oc) => oc.doNothing())
+                  .executeTakeFirst();
+                if (Number(result.numInsertedOrUpdatedRows ?? 0) > 0) added += 1;
+              } catch {
+                // unique-email race; skip
+              }
+            }
+          }
         }
       }
 

@@ -12,13 +12,13 @@ Creating the four accounts we need, and granting Graphed access to each. Roughly
 
 **Create the accounts yourself, then grant us access.** You stay the owner of everything. We configure the API keys, pixels, conversion actions, and campaign infrastructure on our side, and hand you working accounts. There's no need for us to pair on any of it.
 
-> **Before you send this to Benjamin — Cody/Max, fill in the four placeholders below.** They are marked `⟨FILL⟩`. The doc is not sendable until they're replaced.
+> **Note for Graphed:** the four access values below are filled. The LinkedIn Business Manager name is still needed (marked `⟨FILL⟩`) — LinkedIn is optional and not one of the first four channels.
 
 | What we need | Value |
 |---|---|
-| Graphed Google Ads manager (MCC) ID | `⟨FILL — format 123-456-7890⟩` |
-| Graphed Meta Business Manager ID | `⟨FILL — 15-16 digits⟩` |
-| Graphed access email | `⟨FILL — e.g. ads@graphed.com⟩` |
+| Graphed Google Ads manager (MCC) ID | `553-823-3519` |
+| Graphed Meta Business Manager ID | `1649892969436760` |
+| Graphed access email | `admin@graphed.com` |
 | Graphed LinkedIn Business Manager name | `⟨FILL⟩` |
 
 ---
@@ -40,7 +40,7 @@ Creating the four accounts we need, and granting Graphed access to each. Roughly
 
 1. **Tools & Settings** → **Setup** → **Access and security**
 2. **Managers** tab → **+** button
-3. Enter Graphed's manager account ID: **`⟨FILL — format 123-456-7890⟩`**
+3. Enter Graphed's manager account ID: **`553-823-3519`**
 4. Send the request
 
 We'll accept it, and you'll retain full ownership and the ability to revoke at any time.
@@ -70,7 +70,7 @@ Worth repeating because it's the most common irreversible mistake at this step. 
 ### Grant access
 
 1. **Business Settings** → **Users** → **Partners** → **Add** → **Give a partner access to your assets**
-2. Enter Graphed's Business ID: **`⟨FILL — 15-16 digits⟩`**
+2. Enter Graphed's Business ID: **`1649892969436760`**
 3. Assign these assets with these permission levels:
 
 | Asset | Permission |
@@ -96,7 +96,7 @@ Worth repeating because it's the most common irreversible mistake at this step. 
 
 ### Grant access
 
-**Admin** → **Property access management** → **+** → add **`⟨FILL — e.g. ads@graphed.com⟩`** with the **Editor** role.
+**Admin** → **Property access management** → **+** → add **`admin@graphed.com`** with the **Editor** role.
 
 ---
 
@@ -104,7 +104,7 @@ Worth repeating because it's the most common irreversible mistake at this step. 
 
 You already have container **`GTM-KVFXB4S`**, currently installed on the legacy `/corp` site. We'd like to reuse it rather than create a second one — one container across both sites is easier to reason about and avoids double-firing if the two ever share a page.
 
-**Admin** → **Container** → **User Management** → **+** → add **`⟨FILL — e.g. ads@graphed.com⟩`** with:
+**Admin** → **Container** → **User Management** → **+** → add **`admin@graphed.com`** with:
 - Container permission: **Publish**
 - Account permission: **User**
 

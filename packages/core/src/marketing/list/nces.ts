@@ -64,9 +64,12 @@ export async function runNces(): Promise<void> {
           const bigEnough = (enrollment ?? 0) >= 2500;
           const pdTier = (enrollment ?? 0) >= 1000 && (enrollment ?? 0) < 2500;
           if (!bigEnough && !pdTier) continue;
-          if (bigEnough && !HAS_EARLY_GRADES(row.lowest_grade_offered)) {
-            // Enrollments/EC fit needs pre-K/K; keep as PD-only.
-          }
+          // 06 §2.1 GSLO rule: enrollments/EC fit requires pre-K/K. A big
+          // district whose lowest grade is above KG stays PD-only.
+          const modulesFit =
+            bigEnough && HAS_EARLY_GRADES(row.lowest_grade_offered)
+              ? ["pd", "enrollments", "coaching"]
+              : ["pd"];
           const website = row.urls ?? null;
           const { isNew } = await upsertAccount({
             account_name: row.lea_name,
@@ -78,9 +81,7 @@ export async function runNces(): Promise<void> {
             county: row.county_name ?? null,
             nces_leaid: row.leaid ?? null,
             enrollment,
-            modules_fit: bigEnough
-              ? ["pd", "enrollments", "coaching"]
-              : ["pd"],
+            modules_fit: modulesFit,
             source: "nces-ccd",
             source_url: `https://educationdata.urban.org/api/v1/school-districts/ccd/directory/${START_YEAR}/`,
           });

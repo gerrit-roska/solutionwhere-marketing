@@ -1,5 +1,7 @@
 import { getDb } from "@app/core";
 import { warehouseConfig } from "@app/core/marketing/config";
+import { loadMetaAdsAccount } from "@app/core/marketing/warehouse";
+import { CAMPAIGNS } from "@app/core/ads/plan";
 import { Database, TriangleAlert } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +27,8 @@ interface OverviewData {
   accountsByType: { account_type: string; total: number; suppressed: number }[];
   contacts: { total: number; verified_ok: number };
   seoQueue: { status: string; total: number }[];
+  creatives: { status: string; total: number }[];
+  suppressions: number;
   alerts: { check_name: string; severity: string; subject: string; fired_at: Date }[];
 }
 
@@ -64,6 +68,17 @@ async function loadOverview(): Promise<OverviewData | { error: string }> {
         .groupBy("status")
         .execute()
     ).map((row) => ({ status: String(row.status), total: Number(row.total) }));
+    const creatives = (
+      await db
+        .selectFrom("fb_creatives")
+        .select((eb) => ["status", eb.fn.countAll().as("total")])
+        .groupBy("status")
+        .execute()
+    ).map((row) => ({ status: String(row.status), total: Number(row.total) }));
+    const suppressionRow = await db
+      .selectFrom("suppression_domains")
+      .select((eb) => eb.fn.countAll().as("total"))
+      .executeTakeFirstOrThrow();
     const alerts = await db
       .selectFrom("guardrail_alerts")
       .select(["check_name", "severity", "subject", "fired_at"])
@@ -78,6 +93,8 @@ async function loadOverview(): Promise<OverviewData | { error: string }> {
         verified_ok: Number(contactsRow.verified_ok ?? 0),
       },
       seoQueue,
+      creatives,
+      suppressions: Number(suppressionRow.total),
       alerts,
     };
   } catch (error) {
@@ -96,9 +113,24 @@ const SOURCE_LABELS: Record<string, string> = {
   instantly: "Instantly",
 };
 
+function sourceBadgeLabel(
+  key: string,
+  label: string,
+  schema: string,
+  metaAccount: Awaited<ReturnType<typeof loadMetaAdsAccount>>,
+): string {
+  if (!schema) return `${label} — not connected`;
+  if (key === "metaAds" && metaAccount?.name) {
+    const act = metaAccount.id ? ` · act ${metaAccount.id}` : "";
+    return `${label} — ${metaAccount.name}${act}`;
+  }
+  return `${label} · ${schema}`;
+}
+
 export default async function OverviewPage() {
   const data = await loadOverview();
   const sources = warehouseConfig() as unknown as Record<string, string>;
+  const metaAccount = await loadMetaAdsAccount();
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -120,14 +152,14 @@ export default async function OverviewPage() {
           </CardTitle>
           <CardDescription>
             Tiles below light up as the client grants access and sources are
-            connected (see the onboarding packet).
+            connected (see the onboarding packet). Meta is Solutionwhere -
+            Primary, not a personal ad account.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           {Object.entries(SOURCE_LABELS).map(([key, label]) => (
             <Badge key={key} variant={sources[key] ? "success" : "secondary"}>
-              {label}
-              {sources[key] ? "" : " — not connected"}
+              {sourceBadgeLabel(key, label, sources[key] ?? "", metaAccount)}
             </Badge>
           ))}
         </CardContent>
@@ -145,7 +177,7 @@ export default async function OverviewPage() {
         </Card>
       ) : (
         <>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Named accounts</CardDescription>
@@ -180,6 +212,49 @@ export default async function OverviewPage() {
                     {data.seoQueue
                       .map((row) => `${row.total} ${row.status}`)
                       .join(" · ")}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardDescription>Creatives</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-semibold tabular-nums">
+                  {data.creatives.reduce((sum, row) => sum + row.total, 0)}
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    {data.creatives
+                      .map((row) => `${row.total} ${row.status}`)
+                      .join(" · ") || "none yet"}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardDescription>Ads plan</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-semibold tabular-nums">
+                  {CAMPAIGNS.length} campaigns
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    $
+                    {CAMPAIGNS.reduce((n, c) => n + c.monthlyBudgetUsd, 0).toLocaleString()}
+                    /mo peak
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardDescription>Suppression list</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-semibold tabular-nums">
+                  {data.suppressions}
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    domains
                   </span>
                 </div>
               </CardContent>

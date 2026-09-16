@@ -30,3 +30,54 @@ export function withSchemas(sql: string): string {
     return schema;
   });
 }
+
+export interface MetaAdsAccount {
+  schema: string;
+  id: string | null;
+  name: string | null;
+  currency: string | null;
+  timezoneName: string | null;
+}
+
+/** Live identity of the configured Meta Ads warehouse source, if any. */
+export async function loadMetaAdsAccount(): Promise<MetaAdsAccount | null> {
+  const schema = warehouseConfig().metaAds;
+  if (!schema) return null;
+  if (!graphed.isConfigured()) {
+    return {
+      schema,
+      id: null,
+      name: null,
+      currency: null,
+      timezoneName: null,
+    };
+  }
+  try {
+    const rows = await wq<{
+      id: number | string;
+      name: string | null;
+      currency: string | null;
+      timezone_name: string | null;
+    }>(
+      withSchemas(
+        `SELECT id, name, currency, timezone_name FROM {metaAds}.account_history LIMIT 1`,
+      ),
+    );
+    const row = rows[0];
+    return {
+      schema,
+      id: row?.id != null ? String(row.id) : null,
+      name: row?.name ?? null,
+      currency: row?.currency ?? null,
+      timezoneName: row?.timezone_name ?? null,
+    };
+  } catch {
+    return {
+      schema,
+      id: null,
+      name: null,
+      currency: null,
+      timezoneName: null,
+    };
+  }
+}

@@ -93,6 +93,68 @@ export default async function AdsPage() {
         </Card>
       )}
 
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Mode</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Badge variant={ready ? "info" : "secondary"}>
+              {ready ? "validate-only" : "plan only"}
+            </Badge>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {ready
+                ? "API credentials set — reconcile validates against the live account. Nothing applies without --apply."
+                : "No credentials in this environment — the plan validates locally."}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Peak budget</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-semibold tabular-nums">
+              ${totalBudget.toLocaleString()}
+              <span className="ml-1 text-sm font-normal text-muted-foreground">
+                /mo
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              All campaigns created PAUSED.
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Keywords</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-semibold tabular-nums">
+              {totalKeywords}
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              across {CAMPAIGNS.reduce((n, c) => n + c.adGroups.length, 0)} ad
+              groups
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardDescription>Negative lists</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-semibold tabular-nums">
+              {NEGATIVE_LISTS.length}
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {NEGATIVE_LISTS.reduce((n, l) => n + l.terms.length, 0)} terms
+              total
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Campaigns</CardTitle>
