@@ -83,11 +83,15 @@ export default async function AdsPage() {
       {!ready && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">API access not provisioned</CardTitle>
+            <CardTitle className="text-base">
+              Credentials live on the job, not the dashboard
+            </CardTitle>
             <CardDescription>
-              Developer token and service account are pending (FDE-526). The
-              reconcile job stays out of the cron manifest until then; the
-              plan below is what will be created, PAUSED, once access lands.
+              API access is provisioned — all four GOOGLE_ADS_* secrets are
+              set in Graphed (2026-09-16). This dashboard environment does not
+              hold them, so the plan below validates locally; the
+              google-ads-daily job reconciles validate-only against the live
+              account, and nothing applies without an explicit --apply.
             </CardDescription>
           </CardHeader>
         </Card>
