@@ -25,11 +25,18 @@ services:
 # All crons PAUSED during client onboarding (2026-09-15). Deletion is the
 # only real off switch — run one-offs with `graphed dev run -- npm run job:<name>`.
 # Re-enable by replacing `jobs: {}` with uncommented blocks below.
+# Env lists per docs/07 §3.2 — only seo-publish-daily declares project
+# secrets; the rest use the Graphed proxy/Tools or auto-injected
+# GRAPHED_STORAGE_* and need no env list.
 #
 # SEO drafting cron:
 #   seo-publish-daily:
 #     command: npm run job:seo-publish-daily
 #     schedule: { cron: 0 12 * * 1-5, timezone: America/New_York }
+#     env:
+#       - OPENROUTER_API_KEY
+#       - SERPER_API_KEY
+#       - EXA_API_KEY
 #     retries: 0
 #     timeout_seconds: 1800
 #

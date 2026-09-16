@@ -12,6 +12,11 @@
     "referenceDir": "clients/fb/assets/reference_image/product_images",
     "note": "get_built pattern: img2img remix of real product screenshots, rotated per asset. Client-supplied Wisdomwhere UI shots drop into the same folder and take over via rotation."
   },
+  "video": {
+    "aspectRatio": "9:16",
+    "resolution": "1080p",
+    "note": "Vertical for Reels/Stories/Feed placements. Batches generated before 2026-09-16 are 16:9 landscape."
+  },
   "videoSeconds": 30,
-  "reviewBatch": { "videos": 3, "statics": 2 }
+  "reviewBatch": { "videos": 2, "statics": 2 }
 }

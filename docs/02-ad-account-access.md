@@ -127,19 +127,21 @@ Not in the first four channels, but LinkedIn is the one place where "Director of
 Reply with these four values. Nothing sensitive — no passwords, no API keys, and we will never ask you for a password.
 
 ```
-Google Ads Customer ID:    ___-___-____
-Meta Pixel ID:             _______________
-Meta Ad Account ID:        act_____________
-GA4 Measurement ID:        G-__________
+Google Ads Customer ID:    202-304-8623
+Meta Pixel ID:             1055542907381574
+Meta Ad Account ID:        act_1094729323030580
+GA4 Measurement ID:        G-8SEKH48YFH
+Meta Business Portfolio:   2188039488427196
 ```
 
 Plus confirmation of:
 
-- [ ] Google Ads manager access request accepted
-- [ ] Meta partner access granted (ad account + pixel + Page)
-- [ ] GA4 Editor access granted
-- [ ] GTM Publish access granted
+- [ ] Google Ads manager link accepted (Graphed MCC `553-823-3519` → `202-304-8623`) — **Benji, one click once Max/Cody send the request**
+- [x] Meta access granted — pixel live via GTM, CAPI token stored (2026-09-16)
+- [x] GA4 access — key events marked manually (2026-09-16); service-account Editor optional
+- [x] GTM Publish access granted — container `GTM-P5TZ5N4Q` published (2026-09-16)
 - [ ] LinkedIn account manager access granted *(optional)*
+- [ ] **Add an instant-booking scheduler to `/demo`** (Cal.com, Calendly, or similar tied to the AE calendar). Until this exists, the `demo_booked` event and its GA4/Ads/Meta tags have nothing to fire on. The form stays — booking is a parallel path, not a replacement.
 
 ---
 

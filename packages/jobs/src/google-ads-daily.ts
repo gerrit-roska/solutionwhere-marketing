@@ -1,13 +1,14 @@
 import { destroyDb } from "@app/core";
 import { reconcileGoogleAds } from "@app/core/ads/bootstrap";
 
-// Google Ads reconcile (03-google-ads-execution.md). Always validate-only
-// from cron — the account has no developer token yet (FDE-526), so this job
-// is intentionally NOT in graphed.yaml. Run it as a one-off:
+// Google Ads reconcile (03-google-ads-execution.md). API access is
+// provisioned — the GOOGLE_ADS_* secrets were set in Graphed cloud
+// 2026-09-16 — so a run validates every planned mutate against the live
+// account and records the plan in ads_resources. The job is intentionally
+// NOT in graphed.yaml; run it as a one-off:
 //   graphed dev run -- npm run job:google-ads-daily
-// With credentials present it validates every planned mutate against the API
-// and records the plan in ads_resources. --apply stays a human decision made
-// in a local shell, never in the manifest.
+// --apply stays a human decision made in a local shell, never in the
+// manifest.
 
 const apply = process.argv.includes("--apply");
 
