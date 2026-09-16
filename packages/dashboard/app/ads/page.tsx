@@ -284,7 +284,7 @@ export default async function AdsPage() {
             <p className="text-sm text-muted-foreground">
               Nothing reconciled yet — run{" "}
               <code className="text-xs">npm run job:google-ads-daily</code>{" "}
-              once API access lands.
+              to validate the plan against the live account.
             </p>
           ) : (
             <Table>
