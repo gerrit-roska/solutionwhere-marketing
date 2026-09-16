@@ -75,7 +75,9 @@ const kws = (raw: string[]): KeywordPlan[] => raw.map((k) => kw(k));
 // ---------------------------------------------------------------------------
 
 const RSA_PD_MANAGEMENT: RsaPlan = {
-  path1: "professional-development",
+  // RSA path fields cap at 15 chars — "professional-development" (24) is
+  // rejected by the API, so the display path uses the module shorthand.
+  path1: "pd",
   path2: "districts",
   headlines: [
     "PD Management Software",
@@ -103,7 +105,7 @@ const RSA_PD_MANAGEMENT: RsaPlan = {
 };
 
 const RSA_PD_REGISTRATION: RsaPlan = {
-  path1: "professional-development",
+  path1: "pd",
   headlines: [
     "PD Registration Software",
     "End the Registration Backlog",
@@ -130,7 +132,7 @@ const RSA_PD_REGISTRATION: RsaPlan = {
 };
 
 const RSA_PD_TRACKING: RsaPlan = {
-  path1: "professional-development",
+  path1: "pd",
   headlines: [
     "PD Tracking Software",
     "Recertification Reporting",
@@ -1213,6 +1215,13 @@ export function validatePlan(): string[] {
       }
       if (group.rsa.descriptions.length > 4) {
         errors.push(`${group.key}: ${group.rsa.descriptions.length} descriptions (>4)`);
+      }
+      // RSA display paths cap at 15 chars each.
+      if (group.rsa.path1 && group.rsa.path1.length > 15) {
+        errors.push(`${group.key}: path1 "${group.rsa.path1}" is ${group.rsa.path1.length} chars (>15)`);
+      }
+      if (group.rsa.path2 && group.rsa.path2.length > 15) {
+        errors.push(`${group.key}: path2 "${group.rsa.path2}" is ${group.rsa.path2.length} chars (>15)`);
       }
       for (const d of group.rsa.descriptions) {
         if (d.length > 90) errors.push(`${group.key}: description ${d.length} chars (>90)`);

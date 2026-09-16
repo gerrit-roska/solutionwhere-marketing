@@ -24,7 +24,6 @@ import {
 import { googleAdsReady } from "./config";
 import {
   AD_SCHEDULE,
-  CALL_ASSET,
   CALLOUTS,
   CAMPAIGNS,
   GEO_MODIFIERS,
@@ -344,28 +343,10 @@ function assetOps(cid: string, tmpStart: number): unknown[] {
       link(assetRn, "STRUCTURED_SNIPPET"),
     );
   }
-  const callRn = rn.asset(cid, next);
-  ops.push(
-    {
-      assetOperation: {
-        create: {
-          resourceName: callRn,
-          callAsset: {
-            countryCode: "US",
-            phoneNumber: CALL_ASSET.phoneNumber.replace(/^\+1\s?/, ""),
-            adScheduleTargets: AD_SCHEDULE.days.map((day) => ({
-              dayOfWeek: day,
-              startHour: CALL_ASSET.startHour,
-              startMinute: "THIRTY",
-              endHour: CALL_ASSET.endHour,
-              endMinute: "ZERO",
-            })),
-          },
-        },
-      },
-    },
-    link(callRn, "CALL"),
-  );
+  // CALL_ASSET is intentionally not created here: Google requires the
+  // customer to accept the call-recording Terms of Service in the Ads UI
+  // before any CallAsset can be created (CALL_CUSTOMER_CONSENT... error).
+  // Manual step for the client, then add the asset.
   return ops;
 }
 
