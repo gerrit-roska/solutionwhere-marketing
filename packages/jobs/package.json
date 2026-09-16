@@ -11,7 +11,8 @@
     "job:rfp-watch-daily": "tsx src/rfp-watch-daily.ts",
     "job:keyword-refresh-quarterly": "tsx src/keyword-refresh-quarterly.ts",
     "job:google-ads-daily": "tsx src/google-ads-daily.ts",
-    "job:fb-creative-factory-weekly": "tsx src/fb-creative-factory-weekly.ts"
+    "job:fb-creative-factory-weekly": "tsx src/fb-creative-factory-weekly.ts",
+    "job:ads-guardrails-daily": "tsx src/ads-guardrails-daily.ts"
   },
   "dependencies": {
     "@app/core": "*"

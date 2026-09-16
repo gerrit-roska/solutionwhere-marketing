@@ -64,6 +64,20 @@ services:
 #   retries: 1
 #   timeout_seconds: 1800
 #
+# ads-guardrails-daily (07 §4.8): mutations are validate-only by default;
+# --apply stays a local-shell decision, so no apply flag appears here.
+# ads-guardrails-daily:
+#   command: npm run job:ads-guardrails-daily
+#   schedule: { cron: 0 13 * * 1-5, timezone: America/New_York }
+#   env:
+#     - GOOGLE_ADS_DEVELOPER_TOKEN
+#     - GOOGLE_ADS_CUSTOMER_ID
+#     - GOOGLE_ADS_LOGIN_CUSTOMER_ID
+#     - GOOGLE_ADS_SA_KEY_JSON
+#     - SLACK_WEBHOOK_URL
+#   retries: 1
+#   timeout_seconds: 900
+#
 # keyword-refresh-quarterly:
 #   command: npm run job:keyword-refresh-quarterly
 #   schedule: { cron: 0 9 1 1,4,7,10 *, timezone: America/New_York }
