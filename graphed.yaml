@@ -89,4 +89,29 @@ services:
 #   schedule: { cron: 0 6 * * 1, timezone: America/New_York }
 #   retries: 0
 #   timeout_seconds: 14400
+#
+# fb-upload-drafts-weekly (04 §6, 07 §4.10): uploads approved creatives as
+# PAUSED drafts. Dry-run unless --apply; --apply stays a local-shell
+# decision, so no apply flag appears here.
+# fb-upload-drafts-weekly:
+#   command: npm run job:fb-upload-drafts-weekly
+#   schedule: { cron: 0 9 * * 1, timezone: America/New_York }
+#   env:
+#     - FB_ACCESS_TOKEN
+#     - FB_AD_ACCOUNT_ID
+#     - FB_PAGE_ID
+#   retries: 0
+#   timeout_seconds: 3600
+#
+# fb-manage-daily (04 §7, 07 §4.10): daily kill/scale/rotate/flip loop.
+# Read-only reporting unless --apply; 30% account-wide budget cap in code.
+# fb-manage-daily:
+#   command: npm run job:fb-manage-daily
+#   schedule: { cron: 0 7 * * *, timezone: America/New_York }
+#   env:
+#     - FB_ACCESS_TOKEN
+#     - FB_AD_ACCOUNT_ID
+#     - SLACK_WEBHOOK_URL
+#   retries: 0
+#   timeout_seconds: 900
 jobs: {}
