@@ -48,6 +48,10 @@ interface CreativeConfig {
     resolution: string;
     referenceDir: string;
   };
+  video: {
+    aspectRatio: "16:9" | "9:16" | "4:5" | "1:1";
+    resolution: "1080p" | "720p" | "4k";
+  };
   videoSeconds: number;
   reviewBatch: { videos: number; statics: number };
 }
@@ -260,8 +264,8 @@ export async function runCreativeFactory(
             avatarId: config.avatar.avatarId,
             voiceId: config.avatar.voiceId,
             title: row.creative_id,
-            aspectRatio: "16:9",
-            resolution: "1080p",
+            aspectRatio: config.video.aspectRatio,
+            resolution: config.video.resolution,
             captionSrt: true,
           });
           fileKey = `creatives/${dateStamp}/${row.creative_id}.mp4`;
