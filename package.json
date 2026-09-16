@@ -22,7 +22,8 @@
     "job:rfp-watch-daily": "npm run -w @app/jobs job:rfp-watch-daily --",
     "job:keyword-refresh-quarterly": "npm run -w @app/jobs job:keyword-refresh-quarterly --",
     "job:google-ads-daily": "npm run -w @app/jobs job:google-ads-daily --",
-    "job:fb-creative-factory-weekly": "npm run -w @app/jobs job:fb-creative-factory-weekly --"
+    "job:fb-creative-factory-weekly": "npm run -w @app/jobs job:fb-creative-factory-weekly --",
+    "job:ads-guardrails-daily": "npm run -w @app/jobs job:ads-guardrails-daily --"
   },
   "dependencies": {
     "tsx": "^4.19.2"
