@@ -107,6 +107,31 @@ export async function upsertAccount(
   return { isNew: true };
 }
 
+/**
+ * One suppression_domains lookup for a batch of contact inserts (07 §4.2):
+ * returns the subset of the given domains that are suppressed. Matching
+ * contacts are written with suppressed = true, never dropped, so coverage
+ * reporting stays honest.
+ */
+export async function suppressedDomains(
+  domains: (string | null)[],
+): Promise<Set<string>> {
+  const unique = [...new Set(domains.filter((d): d is string => Boolean(d)))];
+  if (unique.length === 0) return new Set();
+  const rows = await getDb()
+    .selectFrom("suppression_domains")
+    .select("domain")
+    .where("domain", "in", unique)
+    .execute();
+  return new Set(rows.map((r) => r.domain));
+}
+
+/** Domain part of an email address; null when the address has none. */
+export function emailDomain(email: string | null): string | null {
+  const domain = email?.split("@")[1];
+  return domain ? domain.toLowerCase() : null;
+}
+
 /** Records a source_runs row around a nightly source module. */
 export async function recordRun(
   source: string,

@@ -8,7 +8,13 @@ import {
   observedPattern,
   type Pattern,
 } from "./patterns";
-import { CRAWL_USER_AGENT, recordRun, sleep } from "./shared";
+import {
+  CRAWL_USER_AGENT,
+  emailDomain,
+  recordRun,
+  sleep,
+  suppressedDomains,
+} from "./shared";
 
 // Staff-directory extraction (06 §3.1): public agencies publish staff
 // directories, most with plain-text emails. 200 accounts per night, max
@@ -163,6 +169,21 @@ export async function runDirectories(): Promise<void> {
         }
       }
 
+      // 07 §4.2: one suppression lookup per account — covers the account
+      // domain plus every email domain found in its directory. Matches are
+      // written suppressed = true, never dropped.
+      const suppressed = await suppressedDomains([
+        account.domain,
+        ...contacts.map((c) => emailDomain(c.email)),
+      ]);
+      const isSuppressed = (email: string | null): boolean => {
+        const d = emailDomain(email);
+        return (
+          (account.domain != null && suppressed.has(account.domain)) ||
+          (d != null && suppressed.has(d))
+        );
+      };
+
       for (const contact of contacts) {
         const match = matchTitle(contact.title);
         if (!match) continue;
@@ -183,6 +204,7 @@ export async function runDirectories(): Promise<void> {
               module_segment: match.module,
               email: contact.email,
               email_source: "directory",
+              suppressed: isSuppressed(contact.email),
             })
             .onConflict((oc) => oc.doNothing())
             .execute();
@@ -231,6 +253,7 @@ export async function runDirectories(): Promise<void> {
                     module_segment: match.module,
                     email,
                     email_source: "pattern",
+                    suppressed: isSuppressed(email),
                   })
                   .onConflict((oc) => oc.doNothing())
                   .executeTakeFirst();
