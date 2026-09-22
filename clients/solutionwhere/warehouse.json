@@ -4,11 +4,12 @@
   "googleAds": "google_ads_y9pi36",
   "metaAds": "fb_ads_3pi2ic",
   "crm": "",
-  "instantly": "",
+  "instantly": "instantly_an495m",
   "demoEventName": "demo_request",
   "notes": {
     "metaAds": "Warehouse connected 2026-09-16. Solutionwhere - Primary, act 1094729323030580, USD, US/Eastern. Replaced George Shapiro personal source fb_ads_gptex9 (FDE-527).",
     "googleAds": "Warehouse connected 2026-09-15. Customer ID 202-304-8623. API write: SA ads-agent@temporal-loop-508721-n9 on Graphed MCC 553-823-3519.",
-    "crm": "CRM undetermined — in-house per Aug 19 kickoff notes, HubSpot per spec. Resolve via FDE-528 before wiring offline conversions."
+    "crm": "CRM undetermined — in-house per Aug 19 kickoff notes, HubSpot per spec. Resolve via FDE-528 before wiring offline conversions.",
+    "instantly": "Warehouse connected 2026-09-22. Schema instantly_an495m, status ready. The overview had been reading an empty schema and showing not connected."
   }
 }
