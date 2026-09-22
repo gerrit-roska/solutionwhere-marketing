@@ -14,7 +14,8 @@
     "job:fb-creative-factory-weekly": "tsx src/fb-creative-factory-weekly.ts",
     "job:fb-upload-drafts-weekly": "tsx src/fb-upload-drafts-weekly.ts",
     "job:fb-manage-daily": "tsx src/fb-manage-daily.ts",
-    "job:ads-guardrails-daily": "tsx src/ads-guardrails-daily.ts"
+    "job:ads-guardrails-daily": "tsx src/ads-guardrails-daily.ts",
+    "job:leads-waterfall": "tsx src/leads-waterfall.ts"
   },
   "dependencies": {
     "@app/core": "*"
