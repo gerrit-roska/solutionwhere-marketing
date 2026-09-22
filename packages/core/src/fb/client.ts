@@ -124,6 +124,52 @@ export interface FbAdSet extends FbNamedEntity {
   dailyBudgetUsd: number | null;
 }
 
+export interface FbCampaignDetail extends FbNamedEntity {
+  objective: string | null;
+  dailyBudgetUsd: number | null;
+}
+
+export async function getCampaign(id: string): Promise<FbCampaignDetail> {
+  const row = await fbGet<{
+    id?: string;
+    name?: string;
+    status?: string;
+    objective?: string;
+    daily_budget?: string;
+  }>(id, { fields: "id,name,status,objective,daily_budget" });
+  return {
+    id: row.id ?? id,
+    name: row.name ?? "",
+    status: row.status ?? "",
+    objective: row.objective ?? null,
+    dailyBudgetUsd: row.daily_budget ? Number(row.daily_budget) / 100 : null,
+  };
+}
+
+export interface FbAd {
+  id: string;
+  name: string;
+  status: string;
+  adSetId: string;
+}
+
+export async function listAds(): Promise<FbAd[]> {
+  const out = await fbGet<{
+    data?: { id?: string; name?: string; status?: string; adset_id?: string }[];
+  }>(`${adAccountPath()}/ads`, {
+    fields: "id,name,status,adset_id",
+    limit: "200",
+  });
+  return (out.data ?? [])
+    .filter((r) => r.id && r.name && r.status !== "DELETED")
+    .map((r) => ({
+      id: r.id as string,
+      name: r.name as string,
+      status: r.status as string,
+      adSetId: r.adset_id ?? "",
+    }));
+}
+
 export async function listAdSets(): Promise<FbAdSet[]> {
   const out = await fbGet<{
     data?: { id?: string; name?: string; status?: string; campaign_id?: string; daily_budget?: string }[];
@@ -212,7 +258,7 @@ export async function uploadAdImage(
   filename: string,
 ): Promise<string> {
   const form = new FormData();
-  form.set("filename", new Blob([bytes], { type: "image/png" }), filename);
+  form.set("filename", new Blob([Buffer.from(bytes)], { type: "image/png" }), filename);
   const out = await fbPostForm<{
     images?: Record<string, { hash?: string }>;
   }>(`${adAccountPath()}/adimages`, form);
