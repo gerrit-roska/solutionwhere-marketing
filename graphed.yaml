@@ -21,6 +21,11 @@ services:
     command: node packages/dashboard/.next/standalone/packages/dashboard/server.js
     port: 3000
     healthcheck: /api/health
+    # Injected so dashboard publish/unpublish can reach Strapi. Values live
+    # in Graphed secrets, not in this file.
+    env:
+      - STRAPI_API_URL
+      - STRAPI_API_TOKEN
 
 # All crons PAUSED during client onboarding (2026-09-15). Deletion is the
 # only real off switch — run one-offs with `graphed dev run -- npm run job:<name>`.
@@ -29,7 +34,10 @@ services:
 # secrets; the rest use the Graphed proxy/Tools or auto-injected
 # GRAPHED_STORAGE_* and need no env list.
 #
-# SEO drafting cron:
+# SEO drafting cron — 3 keywords per weekday noon run (pipeline loops 3×).
+# Strapi articles are configured. Leave this commented until
+# home.solutionwhere.com/blog/{slug} is on the live site, so a deploy
+# does not publish.
 #   seo-publish-daily:
 #     command: npm run job:seo-publish-daily
 #     schedule: { cron: 0 12 * * 1-5, timezone: America/New_York }
@@ -37,8 +45,10 @@ services:
 #       - OPENROUTER_API_KEY
 #       - SERPER_API_KEY
 #       - EXA_API_KEY
+#       - STRAPI_API_URL
+#       - STRAPI_API_TOKEN
 #     retries: 0
-#     timeout_seconds: 1800
+#     timeout_seconds: 5400
 #
 # list-build-nightly:
 #   command: npm run job:list-build-nightly

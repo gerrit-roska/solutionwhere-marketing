@@ -11,7 +11,10 @@
     "ctaUrl": "https://home.solutionwhere.com/professional-development"
   },
   "cms": {
-    "type": "none"
+    "type": "strapi",
+    "collection": "articles",
+    "bodyFormat": "blocks",
+    "publicUrlPattern": "https://home.solutionwhere.com/blog/{slug}"
   },
   "metrics": {
     "searchConsoleSchema": "search_xeyd6x"

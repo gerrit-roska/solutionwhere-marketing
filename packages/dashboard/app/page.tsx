@@ -139,8 +139,9 @@ export default async function OverviewPage() {
           Solutionwhere Marketing
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Named-account pipeline, SEO drafts, AEO panel, and guardrails. Paid
-          channels stay off until conversion tracking is verified.
+          Named-account pipeline, SEO articles on Strapi, AEO panel, and
+          guardrails. Paid channels stay off until conversion tracking is
+          verified.
         </p>
       </div>
 

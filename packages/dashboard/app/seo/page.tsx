@@ -1,5 +1,7 @@
 import { getDb } from "@app/core";
+import { loadClientConfig } from "@app/core/seo/config";
 import { markdownToHtml } from "@app/core/seo/markdown";
+import type { ClientConfig } from "@app/core/seo/types";
 import { loadSeoMetrics, type SeoMetrics } from "@app/core/seo/metrics";
 import {
   loadPlaybooks,
@@ -167,6 +169,16 @@ const TABS = [
 
 type SeoTab = (typeof TABS)[number]["key"];
 
+function publishingLine(cms: ClientConfig["cms"]): string {
+  if (cms.type === "strapi" && cms.collection && cms.publicUrlPattern) {
+    return `Publishing goes to Strapi ${cms.collection} at ${cms.publicUrlPattern}.`;
+  }
+  if (cms.type === "strapi") return "Publishing goes to Strapi.";
+  if (cms.type === "ghost") return "Publishing goes to Ghost.";
+  if (cms.type === "wordpress") return "Publishing goes to WordPress.";
+  return "Publishing is off until a CMS is set in the client config.";
+}
+
 export default async function SeoPage({
   searchParams,
 }: {
@@ -181,6 +193,7 @@ export default async function SeoPage({
   const tab: SeoTab = TABS.some((t) => t.key === searchParams.tab)
     ? (searchParams.tab as SeoTab)
     : "queue";
+  const cms = loadClientConfig().cms;
   const queue = tab === "queue" ? await loadQueue() : [];
   const queueCounts = tab === "queue" ? await loadQueueCounts() : [];
   const queueTotal = queueCounts.reduce((sum, row) => sum + row.total, 0);
@@ -215,8 +228,10 @@ export default async function SeoPage({
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">SEO</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {queueTotal} keywords queued. The seo-publish-daily job takes one
-            keyword per run.
+            {queueTotal} keywords queued. {publishingLine(cms)} A manual run
+            publishes one keyword. The weekday seo-publish-daily job (up to 3
+            keywords) stays paused until https://home.solutionwhere.com/blog is
+            on the live site.
           </p>
         </div>
         <div className="flex items-center gap-2">
