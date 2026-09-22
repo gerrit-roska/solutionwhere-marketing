@@ -32,7 +32,7 @@ export const pluginNavEntries: PluginNavEntry[] = [
     label: "AI Search",
     href: "/aeo",
     group: "Channels",
-    enabled: true,
+    enabled: false,
   },
   {
     key: "ads",
@@ -42,10 +42,17 @@ export const pluginNavEntries: PluginNavEntry[] = [
     enabled: true,
   },
   {
+    key: "facebook",
+    label: "Facebook",
+    href: "/facebook",
+    group: "Channels",
+    enabled: true,
+  },
+  {
     key: "creative",
     label: "Creative",
     href: "/creative",
     group: "Channels",
-    enabled: true,
+    enabled: false,
   },
 ];

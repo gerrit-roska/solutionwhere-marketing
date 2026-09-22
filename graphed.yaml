@@ -26,6 +26,9 @@ services:
     env:
       - STRAPI_API_URL
       - STRAPI_API_TOKEN
+      - FB_ACCESS_TOKEN
+      - FB_AD_ACCOUNT_ID
+      - FB_PAGE_ID
 
 # All crons PAUSED during client onboarding (2026-09-15). Deletion is the
 # only real off switch — run one-offs with `graphed dev run -- npm run job:<name>`.
