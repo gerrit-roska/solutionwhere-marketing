@@ -7,10 +7,11 @@
   },
   "statics": {
     "model": "kie:gpt-image-2-image-to-image",
-    "aspectRatio": "9:16",
+    "aspectRatio": "1:1",
     "resolution": "1K",
     "referenceDir": "clients/fb/assets/reference_image/product_images",
-    "note": "get_built pattern: img2img remix of real product screenshots, rotated per asset. GPT Image 2.0 via Kie takes input_urls (mapped in creative/kie.ts); no output_format param. Client-supplied Wisdomwhere UI shots drop into the same folder and take over via rotation. 9:16 vertical since 2026-09-16: 04 §6 runs Advantage+ placements (Reels/Stories/Feed); the 1:1 batch predates the fix."
+    "brand": "clients/solutionwhere/creative/brand.json",
+    "note": "Feed statics are 1:1. Layout, logo, and light/dark rules live in brand.json. Logo is input_urls[0]; the module screenshot is input_urls[1]. Video stays 9:16."
   },
   "video": {
     "aspectRatio": "9:16",

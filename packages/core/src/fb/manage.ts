@@ -464,9 +464,13 @@ export interface ManageReport {
 
 const runDate = (): string => new Date().toISOString().slice(0, 10);
 
-/** Days since the system-user token was issued (config), for the day-50
- *  alert (04 §1 item 6: tokens expire ~60 days). */
-function tokenDaysRemaining(config: { tokenIssuedAt: string }): number {
+/** Days until the configured token should be rotated. Null when the token
+ *  does not expire (system user, debug_token expires_at = 0). */
+function tokenDaysRemaining(config: {
+  tokenIssuedAt: string;
+  tokenNeverExpires?: boolean;
+}): number | null {
+  if (config.tokenNeverExpires) return null;
   const issued = Date.parse(`${config.tokenIssuedAt}T00:00:00Z`);
   const ageDays = Math.floor((Date.now() - issued) / 86_400_000);
   return TOKEN_EXPIRY_DAYS - ageDays;
@@ -500,7 +504,7 @@ export async function runFbManageDaily(
   // Token age — needs no credentials, runs in every mode.
   const daysLeft = tokenDaysRemaining(config);
   report.tokenDaysRemaining = daysLeft;
-  if (daysLeft <= TOKEN_EXPIRY_DAYS - TOKEN_ALERT_DAYS) {
+  if (daysLeft !== null && daysLeft <= TOKEN_EXPIRY_DAYS - TOKEN_ALERT_DAYS) {
     await fireAlert("fb-token-expiry", "warn", "FB_ACCESS_TOKEN", {
       token_issued_at: config.tokenIssuedAt,
       days_remaining: daysLeft,
@@ -522,7 +526,7 @@ export async function runFbManageDaily(
           `flip: ${report.actions.some((a) => a.kind === "flip") ? "threshold met" : "no"}`,
         `Top personas: ${report.topPersonas.map((p) => `${p.persona} ($${p.cpl.toFixed(0)})`).join(", ") || "—"} | ` +
           `top angles: ${report.topAngles.map((a) => `${a.angle} ($${a.cpl.toFixed(0)})`).join(", ") || "—"}`,
-        `Token: ${daysLeft}d remaining | warehouse: ${report.warehouse}`,
+        `Token: ${daysLeft === null ? "does not expire" : `${daysLeft}d remaining`} | warehouse: ${report.warehouse}`,
       ].join("\n"),
     );
   };

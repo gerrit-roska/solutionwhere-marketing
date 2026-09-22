@@ -8,10 +8,10 @@ import { envSlice, projectRoot } from "../config";
 // (02 §6), and the jobs degrade to a plan-only report until FB_ACCESS_TOKEN
 // lands — googleAdsReady() is the same pattern.
 //
-// Auth is a system-user token with ads_management + ads_read, created
-// 2026-09-16. Meta tokens expire ~60 days; the issue date lives in
-// clients/solutionwhere/fb.json (not env — 07 §3.2 fixes the manifest env
-// lists) and fb-manage-daily alerts at day 50.
+// Auth is a never-expiring system-user token with ads_management + ads_read,
+// rotated 2026-09-22. The issue date lives in clients/solutionwhere/fb.json
+// (not env — 07 §3.2 fixes the manifest env lists). fb-manage-daily alerts
+// at day 50 only when tokenNeverExpires is false.
 
 const fbEnvSchema = z.object({
   FB_ACCESS_TOKEN: z.string().min(1).optional(),
@@ -51,6 +51,9 @@ const fbConfigSchema = z.object({
     .regex(/^v\d+\.\d+$/)
     .default("v23.0"),
   tokenIssuedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  // System-user tokens can be non-expiring (debug_token expires_at = 0).
+  // When true, fb-manage-daily skips the 60-day rotation alert.
+  tokenNeverExpires: z.boolean().default(false),
   urlTags: z.string().min(1),
   campaign: z.object({
     name: z.string().min(1),

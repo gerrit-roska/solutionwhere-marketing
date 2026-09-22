@@ -3,11 +3,11 @@
 img2img inputs for the statics pipeline (rotated per asset by the creative
 factory).
 
-- `logo-solutionwhere.jpg` — **the** Solutionwhere logo (red circle + white
-  stylized S, black lowercase wordmark). Per Gerrit 2026-09-16: whenever a
-  generated static includes a logo, it must be some variation of THIS logo.
-  Changing the logo's background to fit the creative is fine; the mark itself
-  does not change.
+- `logo-solutionwhere.png` — **the** official Solutionwhere logo (blue center
+  dot, orange/blue ring, orange "solution" + blue "where" wordmark). GPT Image
+  2 statics always pass this as the first `input_urls` reference; do not swap
+  it for another file. Background around the logo may change; the mark itself
+  does not.
 - `home-page.png`, `pd-page.png`, `enrollments-page.png`, `coaching-page.png`,
   `referrals-page.png`, `demo-page.png` — real site screenshots
   (home.solutionwhere.com). Product UI in statics should look like these.

@@ -54,6 +54,47 @@ export interface NegativeListPlan {
 }
 
 const SITE = "https://home.solutionwhere.com";
+const PD = `${SITE}/professional-development`;
+const ENR = `${SITE}/enrollments`;
+const CCH = `${SITE}/coaching`;
+const REF = `${SITE}/referrals`;
+const RECERT_BLOG = `${SITE}/blog/keep-track-of-ceus-and-professional-development-records-for-recertification`;
+
+/** Comparison pages are not on the live site yet. Route each competitor to the matching module page. */
+const COMPARE_LANDING: Record<string, string> = {
+  "frontline-professional-growth": PD,
+  mylearningplan: PD,
+  "vector-solutions": PD,
+  kalpa: PD,
+  escworks: PD,
+  pdplanner: PD,
+  "schooldata-net": PD,
+  growelab: PD,
+  plad: PD,
+  schoolmint: ENR,
+  "powerschool-enrollment": ENR,
+  "infinite-campus-online-registration": ENR,
+  avela: ENR,
+  enrollwise: ENR,
+  edbrix: ENR,
+  sibme: CCH,
+  "kickup-learning": CCH,
+  "kickup-foundations": CCH,
+  teachboost: CCH,
+  "schoolstatus-coach": CCH,
+  edthena: CCH,
+  "iris-connect": CCH,
+  "whetstone-education": CCH,
+  bullseye: CCH,
+  "worklife-systems": REF,
+  icarol: REF,
+  kindersystems: REF,
+  bridgecare: REF,
+  wonderschool: REF,
+  insight: REF,
+};
+
+const compareUrl = (slug: string) => COMPARE_LANDING[slug] ?? PD;
 
 /** Parse spec notation: [exact] "phrase". Anything else throws — broad match is banned. */
 export function kw(raw: string, overrides: Partial<KeywordPlan> = {}): KeywordPlan {
@@ -1000,11 +1041,15 @@ export const CAMPAIGNS: CampaignPlan[] = [
         ] as [string, string][]
       ).map(([slug, name]): AdGroupPlan => {
         const lower = name.toLowerCase();
+        const blogSlug =
+          slug === "arizona"
+            ? "arizona-teaching-certification"
+            : `${slug}-teacher-certification`;
         return {
           key: `${slug}-recert`,
           name: `${slug}-recert - EX-PH`,
           cpcUsd: 4.0,
-          finalUrl: `${SITE}/blog/steps-to-${slug}-teacher-certification`,
+          finalUrl: `${SITE}/blog/steps-to-${blogSlug}`,
           rsa: RSA_PD_TRACKING,
           keywords: kws([
             `[${lower} teacher certification renewal]`,
@@ -1021,7 +1066,7 @@ export const CAMPAIGNS: CampaignPlan[] = [
         key: "scech",
         name: "scech - EX",
         cpcUsd: 4.0,
-        finalUrl: `${SITE}/scech`,
+        finalUrl: PD,
         rsa: RSA_PD_TRACKING,
         keywords: kws([
           "[scech tracking software]",
@@ -1033,7 +1078,7 @@ export const CAMPAIGNS: CampaignPlan[] = [
         key: "act-48",
         name: "act-48 - EX",
         cpcUsd: 4.0,
-        finalUrl: `${SITE}/act-48`,
+        finalUrl: PD,
         rsa: RSA_PD_TRACKING,
         keywords: kws([
           "[act 48 tracking software]",
@@ -1045,7 +1090,7 @@ export const CAMPAIGNS: CampaignPlan[] = [
         key: "cpe-texas",
         name: "cpe-texas - EX",
         cpcUsd: 4.0,
-        finalUrl: `${SITE}/blog/steps-to-texas-teacher-certification`,
+        finalUrl: RECERT_BLOG,
         rsa: RSA_PD_TRACKING,
         keywords: kws([
           "[cpe tracking software teachers]",
@@ -1056,7 +1101,7 @@ export const CAMPAIGNS: CampaignPlan[] = [
         key: "lpdc",
         name: "lpdc - EX",
         cpcUsd: 4.0,
-        finalUrl: `${SITE}/lpdc`,
+        finalUrl: PD,
         rsa: RSA_PD_TRACKING,
         keywords: kws([
           "[lpdc tracking software]",
@@ -1067,7 +1112,7 @@ export const CAMPAIGNS: CampaignPlan[] = [
         key: "ctle",
         name: "ctle - EX",
         cpcUsd: 4.0,
-        finalUrl: `${SITE}/ctle`,
+        finalUrl: PD,
         rsa: RSA_PD_TRACKING,
         keywords: kws(["[ctle tracking software]", "[ctle hours reporting]"]),
       },
@@ -1075,7 +1120,7 @@ export const CAMPAIGNS: CampaignPlan[] = [
         key: "illinois-clock-hours",
         name: "illinois-clock-hours - EX",
         cpcUsd: 4.0,
-        finalUrl: `${SITE}/blog/steps-to-illinois-teacher-certification`,
+        finalUrl: RECERT_BLOG,
         rsa: RSA_PD_TRACKING,
         keywords: kws([
           "[illinois pd clock hours tracking]",
