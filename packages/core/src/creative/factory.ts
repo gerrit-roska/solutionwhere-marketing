@@ -135,10 +135,6 @@ async function writeCopy(
         `Persona: ${persona.name}. Angle: ${ANGLE_NAMES[row.angle] ?? row.angle}.\n` +
         (row.hook ? `Hook: "${row.hook}".\n` : "This is a product-demo ad; the visual carries it.\n") +
         `Pain: "${persona.pain}". Proof: ${persona.proof}.\n` +
-        (persona.module === "pd"
-          ? "Lead with the concrete offer: 80% less time on PD registration admin. " +
-            "Name Act 48 / SCECH / CTLE only if it fits the angle.\n"
-          : "") +
         `The headline must be unique — do not reuse any of these: ${[...usedHeadlines].join(" | ") || "(none yet)"}.`,
     },
   ]);
@@ -162,34 +158,18 @@ async function download(url: string): Promise<Uint8Array> {
   return new Uint8Array(await response.arrayBuffer());
 }
 
-/** Upload a reference file to storage and return a presigned URL for Kie. */
-async function referenceUrl(
-  config: CreativeConfig,
-  filename: string,
-  contentType: string,
-): Promise<string> {
+/** Reference screenshots, uploaded to storage once so Kie can fetch them. */
+async function referenceUrls(config: CreativeConfig, dateStamp: string): Promise<string[]> {
   const dir = join(projectRoot(), config.statics.referenceDir);
-  const key = `creatives/reference/${filename}`;
-  const existing = await getBytes(key);
-  if (!existing) {
-    await putBytes(
-      key,
-      new Uint8Array(readFileSync(join(dir, filename))),
-      contentType,
-    );
-  }
-  return presignGet(key, 3600);
-}
-
-/** Product screenshots for img2img rotation (excludes the logo file). */
-async function productReferenceUrls(config: CreativeConfig): Promise<string[]> {
-  const dir = join(projectRoot(), config.statics.referenceDir);
-  const files = readdirSync(dir)
-    .filter((f) => f.endsWith(".png") && !f.startsWith("logo-"))
-    .sort();
+  const files = readdirSync(dir).filter((f) => f.endsWith(".png")).sort();
   const urls: string[] = [];
   for (const file of files) {
-    urls.push(await referenceUrl(config, file, "image/png"));
+    const key = `creatives/reference/${file}`;
+    const existing = await getBytes(key);
+    if (!existing) {
+      await putBytes(key, new Uint8Array(readFileSync(join(dir, file))), "image/png");
+    }
+    urls.push(await presignGet(key, 3600));
   }
   return urls;
 }
@@ -240,9 +220,8 @@ export async function runCreativeFactory(
   // DB creative_id is the per-asset composite `${matrixId}:${format}`.
   const done = new Set(existing.map((r) => r.creative_id));
 
-  let logoUrl: string | null = null;
-  let productUrls: string[] | null = null;
-  let productCursor = 0;
+  let refUrls: string[] | null = null;
+  let refCursor = 0;
   let videos = 0;
   let statics = 0;
 
@@ -298,42 +277,18 @@ export async function runCreativeFactory(
           );
           videos += 1;
         } else {
-          logoUrl ??= await referenceUrl(
-            config,
-            "logo-solutionwhere.png",
-            "image/png",
-          );
-          productUrls ??= await productReferenceUrls(config);
-          const moduleShot: Record<string, string> = {
-            pd: "pd-page.png",
-            enrollments: "enrollments-page.png",
-            coaching: "coaching-page.png",
-            referrals: "referrals-page.png",
-          };
-          const refDir = join(projectRoot(), config.statics.referenceDir);
-          const preferred = moduleShot[persona.module];
-          const product =
-            preferred && readdirSync(refDir).includes(preferred)
-              ? await referenceUrl(config, preferred, "image/png")
-              : productUrls.length > 0
-                ? productUrls[productCursor % productUrls.length]
-                : null;
-          productCursor += 1;
+          refUrls ??= await referenceUrls(config, dateStamp);
+          const reference = refUrls[refCursor % refUrls.length];
+          refCursor += 1;
           const prompt =
-            "Create a clean Meta feed ad for a B2B education-agency platform. " +
-            "The first reference image is the official Solutionwhere logo — " +
-            "use that exact mark (blue center dot, orange/blue ring dots, " +
-            "'solution' in orange and 'where' in blue lowercase). Do not invent " +
-            "a different logo. " +
-            (product
-              ? "The second reference is a real product screenshot — keep the UI recognizable. "
-              : "") +
-            `Add a bold headline overlay reading "${copy.headline}". ` +
-            "Dark slate background, white text, no stock photography, no children, " +
-            "no people. Minimal, professional.";
+            "Turn this product screenshot into a clean Meta feed ad for a B2B " +
+            "education-agency platform. Keep the product UI recognizable and " +
+            "sharp — it is the proof. Add a bold headline overlay reading " +
+            `"${copy.headline}". Dark slate background, white text, no stock ` +
+            "photography, no children, no people. Minimal, professional.";
           const url = await renderImage(config.statics.model, {
             prompt,
-            imageInput: product ? [logoUrl, product] : [logoUrl],
+            imageInput: [reference],
             aspectRatio: config.statics.aspectRatio,
             resolution: config.statics.resolution as "1K" | "2K" | "4K",
             outputFormat: "png",

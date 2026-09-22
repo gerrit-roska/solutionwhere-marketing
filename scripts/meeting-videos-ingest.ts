@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 import { getDb, destroyDb } from "../packages/core/src/db";
@@ -41,13 +41,9 @@ async function main(): Promise<void> {
   const db = getDb();
   mkdirSync(DESKTOP, { recursive: true });
 
-  const bytes = url.startsWith("/")
-    ? new Uint8Array(readFileSync(url))
-    : await (async () => {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`download ${response.status}`);
-        return new Uint8Array(await response.arrayBuffer());
-      })();
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`download ${response.status}`);
+  const bytes = new Uint8Array(await response.arrayBuffer());
 
   const fileKey = `creatives/${DATE}/${id}.mp4`;
   await putBytes(fileKey, bytes, "video/mp4");

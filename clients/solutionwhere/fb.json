@@ -2,9 +2,8 @@
   "pixelId": "1055542907381574",
   "apiVersion": "v23.0",
   "apiVersionNote": "Single constant to bump when Meta deprecates a version; versions are supported ~2 years.",
-  "tokenIssuedAt": "2026-09-22",
-  "tokenNeverExpires": true,
-  "tokenNote": "Never-expiring system user Graphed (app Graphed) with ads_management + ads_read. Replaced the blocked token on 2026-09-22. debug_token expires_at is 0.",
+  "tokenIssuedAt": "2026-09-16",
+  "tokenNote": "System-user token with ads_management + ads_read, created 2026-09-16 (02 §Meta). Meta tokens expire ~60 days; fb-manage-daily alerts at day 50 (04 §1 item 6).",
   "urlTags": "utm_source=facebook&utm_medium=paid_social&utm_campaign={{campaign.name}}&utm_content={{ad.name}}",
   "campaign": {
     "name": "CAMP 01 | Andromeda",
