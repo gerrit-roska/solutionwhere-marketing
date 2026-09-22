@@ -8,7 +8,6 @@ import {
   getAdStatus,
   listAdSets,
   pauseAd,
-  setAdSetDailyBudget,
 } from "./client";
 import { fbReady, loadFbConfig } from "./config";
 
@@ -30,7 +29,7 @@ import { fbReady, loadFbConfig } from "./config";
 export const TARGET_CPL = 150; // $ per Lead — launch target
 export const TARGET_CPQD = 500; // $ per qualified_demo — the number that matters
 export const MAX_DAILY_INCREASE_PCT = 30; // account-wide, per day
-export const SCALE_PCT = 20; // ad-set budget step on a win
+export const SCALE_PCT = 20; // kept for the cap math; the daily job does not apply it
 export const KILL_SPEND_NO_LEAD_USD = 2 * TARGET_CPL; // 7d, 0 leads
 export const KILL_NO_QUALIFIED_SPEND_USD = 3 * TARGET_CPQD; // 30d, >=3 leads, 0 qualified
 export const KILL_NO_QUALIFIED_MIN_LEADS = 3;
@@ -688,36 +687,19 @@ export async function runFbManageDaily(
 
   for (const plan of scalePlans) {
     const subject = `ad set ${plan.adsetId}`;
-    let applied = false;
-    const reason = plan.deferred
-      ? (plan.deferReason ?? "deferred")
-      : `CPL $${plan.cpl7.toFixed(2)} <= $${TARGET_CPL} with ${plan.leads7} leads/7d — budget +${SCALE_PCT}%`;
-    if (apply && !plan.deferred) {
-      try {
-        await setAdSetDailyBudget(plan.adsetId, plan.newBudgetUsd);
-        applied = true;
-        await db.insertInto("fb_actions").values({
-          run_date: runDate(),
-          ad_id: null,
-          creative_id: null,
-          action: "scale",
-          reason,
-          before: JSON.stringify({ adset_id: plan.adsetId, daily_budget_usd: plan.currentBudgetUsd }),
-          after: JSON.stringify({ adset_id: plan.adsetId, daily_budget_usd: plan.newBudgetUsd }),
-        }).execute();
-      } catch (error) {
-        report.errors.push(`scale ${plan.adsetId}: ${error instanceof Error ? error.message : String(error)}`);
-      }
-    }
+    // One $50/day campaign budget. A winning ad set is recorded for next
+    // week's weights and is not given its own raise.
+    const reason = `CPL $${plan.cpl7.toFixed(2)} <= $${TARGET_CPL} with ${plan.leads7} leads/7d — noted, campaign budget stays $${config.campaign.dailyBudgetUsd}/day`;
     report.actions.push({
       kind: "scale",
       subject,
       reason,
-      applied,
+      applied: false,
       detail: {
         current_budget_usd: plan.currentBudgetUsd,
-        new_budget_usd: plan.newBudgetUsd,
-        deferred: plan.deferred,
+        new_budget_usd: plan.currentBudgetUsd,
+        deferred: true,
+        defer_reason: "campaign budget is fixed",
       },
     });
   }

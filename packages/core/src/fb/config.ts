@@ -57,7 +57,7 @@ const fbConfigSchema = z.object({
     objective: z.string().min(1),
     optimizationEvent: z.string().min(1),
     flipToCustomConversion: z.string().min(1),
-    dailyBudgetPerAdSetUsd: z.number().positive(),
+    dailyBudgetUsd: z.number().positive(),
     geoCountries: z.array(z.string().length(2)).min(1),
     excludedCustomAudienceIds: z.array(z.string()).default([]),
     adSetsByModule: z.record(z.string().min(1)),

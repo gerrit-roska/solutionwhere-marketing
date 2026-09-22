@@ -4,9 +4,10 @@ import type { FbConfig } from "./config";
 
 // The 04 §6 campaign structure, adopt-first (same rule as ads/bootstrap.ts:
 // never duplicate an existing campaign). CAMP 01 | Andromeda with one broad
-// Advantage+ ad set per module. Everything is created PAUSED; budgets live
-// at ad-set level. CAMP 02 (retargeting) and CAMP 03 (ABM) are out of scope
-// here — they need audiences that don't exist yet (pixel live 2026-09-16).
+// Advantage+ ad set per module. Everything is created PAUSED. The $50/day
+// budget lives on the campaign, shared across the four ad sets. CAMP 02
+// (retargeting) and CAMP 03 (ABM) are out of scope here — they need
+// audiences that don't exist yet (pixel live 2026-09-16).
 //
 // Resolution is recorded in the shared ads_resources ledger
 // (resource_type fb_campaign / fb_adset), same as the Google bootstrap.
@@ -83,6 +84,7 @@ export async function resolveStructure(
     const created = await createCampaign({
       name: config.campaign.name,
       objective: config.campaign.objective,
+      dailyBudgetUsd: config.campaign.dailyBudgetUsd,
     });
     result.campaignId = created.id;
     result.created.push(`campaign:${config.campaign.name}`);
@@ -104,16 +106,12 @@ export async function resolveStructure(
     if (!apply || !result.campaignId) {
       // Dry-run, or the campaign itself is only planned — no id to nest under.
       result.planned.push(`adset:${adSetName}`);
-      await ledger("fb_adset", adSetName, "planned", undefined, {
-        module,
-        dailyBudgetUsd: config.campaign.dailyBudgetPerAdSetUsd,
-      });
+      await ledger("fb_adset", adSetName, "planned", undefined, { module });
       continue;
     }
     const created = await createAdSet({
       name: adSetName,
       campaignId: result.campaignId,
-      dailyBudgetUsd: config.campaign.dailyBudgetPerAdSetUsd,
       pixelId: config.pixelId,
       optimizationEvent: config.campaign.optimizationEvent,
       geoCountries: config.campaign.geoCountries,

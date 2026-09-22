@@ -17,12 +17,15 @@ export class FbApiError extends Error {
       type?: string;
       code?: number;
       error_subcode?: number;
+      error_user_title?: string;
+      error_user_msg?: string;
+      error_data?: unknown;
     } | null,
     body: string,
   ) {
     super(
       meta?.message
-        ? `Meta API ${status}: ${meta.message} (code ${meta.code ?? "?"}, subcode ${meta.error_subcode ?? "?"})`
+        ? `Meta API ${status}: ${meta.message} (code ${meta.code ?? "?"}, subcode ${meta.error_subcode ?? "?"})${meta.error_user_msg ? ` — ${meta.error_user_msg}` : ""}`
         : `Meta API ${status}: ${body.slice(0, 300)}`,
     );
     this.name = "FbApiError";
@@ -150,6 +153,7 @@ const PAUSED = "PAUSED" as const;
 export function createCampaign(fields: {
   name: string;
   objective: string;
+  dailyBudgetUsd: number;
 }): Promise<{ id: string }> {
   return fbPost<{ id: string }>(`${adAccountPath()}/campaigns`, {
     name: fields.name,
@@ -157,13 +161,15 @@ export function createCampaign(fields: {
     buying_type: "AUCTION",
     status: PAUSED,
     special_ad_categories: [],
+    // One campaign budget. Ad sets under this campaign must not set their own.
+    daily_budget: Math.round(fields.dailyBudgetUsd * 100),
+    bid_strategy: "LOWEST_COST_WITHOUT_CAP",
   });
 }
 
 export function createAdSet(fields: {
   name: string;
   campaignId: string;
-  dailyBudgetUsd: number;
   pixelId: string;
   optimizationEvent: string;
   geoCountries: string[];
@@ -173,7 +179,6 @@ export function createAdSet(fields: {
     name: fields.name,
     campaign_id: fields.campaignId,
     status: PAUSED,
-    daily_budget: Math.round(fields.dailyBudgetUsd * 100),
     billing_event: "IMPRESSIONS",
     optimization_goal: "OFFSITE_CONVERSIONS",
     destination_type: "WEBSITE",
@@ -295,10 +300,14 @@ function createAdCreative(
     // 04 §4: UTMs on every ad, with Meta's own campaign/ad name params.
     url_tags: urlTags,
     // 04 §6: Advantage+ creative enhancements OFF — they rewrite headlines
-    // and break the one-headline-per-ad rule. Revisit after 30 days.
+    // and break the one-headline-per-ad rule. standard_enhancements is
+    // rejected (subcode 3858504); opt out of the features that change copy.
     degrees_of_freedom_spec: {
       creative_features_spec: {
-        standard_enhancements: { enroll_status: "OPT_OUT" },
+        text_optimizations: { enroll_status: "OPT_OUT" },
+        image_templates: { enroll_status: "OPT_OUT" },
+        image_touchups: { enroll_status: "OPT_OUT" },
+        enhance_cta: { enroll_status: "OPT_OUT" },
       },
     },
   });
