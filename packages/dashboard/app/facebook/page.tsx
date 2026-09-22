@@ -1,4 +1,4 @@
-import { getCampaign, listAds, listAdSets, listCampaigns } from "@app/core/fb/client";
+import { listAds, listAdSets, listCampaigns } from "@app/core/fb/client";
 import { fbReady, loadFbConfig } from "@app/core/fb/config";
 import { loadMetaAdsAccount } from "@app/core/marketing/warehouse";
 import { Badge } from "@/components/ui/badge";
@@ -20,11 +20,29 @@ import {
 
 export const dynamic = "force-dynamic";
 
+const LANDINGS: Record<string, string> = {
+  pd: "https://home.solutionwhere.com/professional-development?module=pd",
+  enrollments: "https://home.solutionwhere.com/enrollments?module=enrollments",
+  coaching: "https://home.solutionwhere.com/coaching?module=coaching",
+  referrals: "https://home.solutionwhere.com/referrals?module=referrals",
+};
+
+interface LiveAd {
+  id: string;
+  name: string;
+  status: string;
+  link: string | null;
+  urlTags: string | null;
+}
+
 interface LiveAdSet {
   id: string;
   name: string;
   status: string;
-  ads: { id: string; name: string; status: string }[];
+  campaignId: string | null;
+  pixelId: string | null;
+  customEventType: string | null;
+  ads: LiveAd[];
 }
 
 interface LiveCampaign {
@@ -33,34 +51,45 @@ interface LiveCampaign {
   status: string;
   objective: string | null;
   dailyBudgetUsd: number | null;
+}
+
+interface LiveAccount {
+  campaigns: LiveCampaign[];
   adSets: LiveAdSet[];
 }
 
-async function loadLive(campaignName: string): Promise<LiveCampaign | { error: string } | null> {
+async function loadLive(): Promise<LiveAccount | { error: string } | null> {
   if (!fbReady()) return null;
   try {
-    const campaigns = await listCampaigns();
-    const match = campaigns.find((campaign) => campaign.name === campaignName);
-    if (!match) return { error: `${campaignName} is not in the ad account.` };
-    const [detail, adSets, ads] = await Promise.all([
-      getCampaign(match.id),
+    const [campaigns, adSets, ads] = await Promise.all([
+      listCampaigns(),
       listAdSets(),
       listAds(),
     ]);
-    const sets = adSets.filter((set) => set.campaignId === match.id);
     return {
-      id: detail.id,
-      name: detail.name,
-      status: detail.status,
-      objective: detail.objective,
-      dailyBudgetUsd: detail.dailyBudgetUsd,
-      adSets: sets.map((set) => ({
+      campaigns: campaigns.map((campaign) => ({
+        id: campaign.id,
+        name: campaign.name,
+        status: campaign.status,
+        objective: campaign.objective,
+        dailyBudgetUsd: campaign.dailyBudgetUsd,
+      })),
+      adSets: adSets.map((set) => ({
         id: set.id,
         name: set.name,
         status: set.status,
+        campaignId: set.campaignId,
+        pixelId: set.pixelId,
+        customEventType: set.customEventType,
         ads: ads
           .filter((ad) => ad.adSetId === set.id)
-          .map((ad) => ({ id: ad.id, name: ad.name, status: ad.status })),
+          .map((ad) => ({
+            id: ad.id,
+            name: ad.name,
+            status: ad.status,
+            link: ad.link,
+            urlTags: ad.urlTags,
+          })),
       })),
     };
   } catch (error) {
@@ -72,25 +101,57 @@ function money(value: number): string {
   return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
 }
 
+function pathOf(link: string): string {
+  try {
+    const url = new URL(link);
+    return `${url.pathname}${url.search}`;
+  } catch {
+    return link;
+  }
+}
+
 export default async function FacebookPage() {
   const config = loadFbConfig();
-  const [account, live] = await Promise.all([
-    loadMetaAdsAccount(),
-    loadLive(config.campaign.name),
-  ]);
+  const [account, live] = await Promise.all([loadMetaAdsAccount(), loadLive()]);
   const planSets = Object.entries(config.campaign.adSetsByModule);
   const liveOk = live && !("error" in live) ? live : null;
   const liveError = live && "error" in live ? live.error : null;
-  const budget = liveOk?.dailyBudgetUsd ?? config.campaign.dailyBudgetUsd;
-  const adCount = liveOk?.adSets.reduce((n, set) => n + set.ads.length, 0) ?? 0;
+  const campaigns = liveOk?.campaigns ?? [
+    {
+      id: "plan",
+      name: config.campaign.name,
+      status: "PAUSED",
+      objective: config.campaign.objective,
+      dailyBudgetUsd: config.campaign.dailyBudgetUsd,
+    },
+  ];
+  const primary = campaigns.find((campaign) => campaign.name === config.campaign.name) ?? campaigns[0];
+  const adSets = liveOk
+    ? liveOk.adSets
+    : planSets.map(([module, name]) => ({
+        id: module,
+        name,
+        status: "PAUSED",
+        campaignId: primary?.id ?? null,
+        pixelId: config.pixelId,
+        customEventType: config.campaign.optimizationEvent,
+        ads: [] as LiveAd[],
+      }));
+  const adCount = adSets.reduce((n, set) => n + set.ads.length, 0);
+  const urlTags = [
+    ...new Set(adSets.flatMap((set) => set.ads.map((ad) => ad.urlTags).filter(Boolean))),
+  ];
+  const pixels = [...new Set(adSets.map((set) => set.pixelId).filter(Boolean))];
+  const events = [...new Set(adSets.map((set) => set.customEventType).filter(Boolean))];
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Facebook</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {account?.name ?? "Solutionwhere - Primary"}. One campaign budget,
-          shared across the four module ad sets. Ads stay paused.
+          {account?.name ?? "Solutionwhere - Primary"}
+          {account?.id ? ` · act ${account.id}` : " · act 1094729323030580"}.
+          Ads stay paused.
         </p>
       </div>
 
@@ -115,62 +176,90 @@ export default async function FacebookPage() {
         </Card>
       ) : null}
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Campaign</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg font-semibold">{config.campaign.name}</p>
-            <Badge variant="secondary" className="mt-2">
-              {liveOk?.status ?? "PAUSED"}
-            </Badge>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Daily budget</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-semibold tabular-nums">{money(budget)}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              One budget for all four ad sets.
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Optimizing for</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg font-semibold">{config.campaign.optimizationEvent}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {liveOk?.objective ?? config.campaign.objective}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Ads</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-semibold tabular-nums">
-              {liveOk ? adCount : "40"}
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Ten squares in each ad set.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Campaigns</CardTitle>
+          <CardDescription>
+            Every campaign in the ad account. {config.campaign.name} is the
+            launch campaign, at {money(config.campaign.dailyBudgetUsd)} a day.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Campaign</TableHead>
+                <TableHead>Objective</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Daily budget</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {campaigns.map((campaign) => (
+                <TableRow key={campaign.id}>
+                  <TableCell>{campaign.name}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {campaign.objective ?? "—"}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="secondary">{campaign.status}</Badge>
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {campaign.dailyBudgetUsd == null ? "—" : money(campaign.dailyBudgetUsd)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Tracking</CardTitle>
+          <CardDescription>
+            Pixel {pixels[0] ?? config.pixelId}. Ad sets optimize on{" "}
+            {events.join(", ") || config.campaign.optimizationEvent}.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Event</TableHead>
+                <TableHead>Where it fires</TableHead>
+                <TableHead>Role</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>Lead</TableCell>
+                <TableCell className="text-muted-foreground">Demo form, pixel and server</TableCell>
+                <TableCell>What the ad sets optimize on</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Schedule</TableCell>
+                <TableCell className="text-muted-foreground">Calendly confirm</TableCell>
+                <TableCell>Booked demo. Recorded, not the optimization event</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>qualified_demo</TableCell>
+                <TableCell className="text-muted-foreground">CRM stage</TableCell>
+                <TableCell>Replaces Lead after 25 in 30 days</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+          <p className="mt-4 text-sm text-muted-foreground">
+            URL tags: {urlTags[0] ?? config.urlTags}
+          </p>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Ad sets</CardTitle>
           <CardDescription>
-            {account?.id ? `act ${account.id}` : "act 1094729323030580"}
-            {account?.currency ? ` · ${account.currency}` : ""}
-            {account?.timezoneName ? ` · ${account.timezoneName}` : ""}
+            {adCount || 40} ads across {adSets.length} ad sets.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -179,29 +268,37 @@ export default async function FacebookPage() {
               <TableRow>
                 <TableHead>Ad set</TableHead>
                 <TableHead>Module</TableHead>
+                <TableHead>Pixel event</TableHead>
+                <TableHead>Landing</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Ads</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {(liveOk ? liveOk.adSets.map((set) => {
+              {adSets.map((set) => {
                 const module = planSets.find(([, name]) => name === set.name)?.[0] ?? "";
-                return { name: set.name, module, status: set.status, ads: set.ads.length };
-              }) : planSets.map(([module, name]) => ({
-                name,
-                module,
-                status: "PAUSED",
-                ads: 10,
-              }))).map((row) => (
-                <TableRow key={row.name}>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell className="text-muted-foreground">{row.module}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{row.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">{row.ads}</TableCell>
-                </TableRow>
-              ))}
+                const links = [...new Set(set.ads.map((ad) => ad.link).filter(Boolean))];
+                const landing = links[0] ?? (module ? LANDINGS[module] : null);
+                return (
+                  <TableRow key={set.id}>
+                    <TableCell>{set.name}</TableCell>
+                    <TableCell className="text-muted-foreground">{module || "—"}</TableCell>
+                    <TableCell>
+                      {set.customEventType ?? "—"}
+                      {set.pixelId && set.pixelId !== config.pixelId ? ` · ${set.pixelId}` : ""}
+                    </TableCell>
+                    <TableCell className="max-w-xs truncate text-muted-foreground">
+                      {landing ? pathOf(landing) : "—"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">{set.status}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {set.ads.length || (liveOk ? 0 : 10)}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>
@@ -218,15 +315,19 @@ export default async function FacebookPage() {
                 <TableRow>
                   <TableHead>Ad</TableHead>
                   <TableHead>Ad set</TableHead>
+                  <TableHead>Landing</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {liveOk.adSets.flatMap((set) =>
+                {adSets.flatMap((set) =>
                   set.ads.map((ad) => (
                     <TableRow key={ad.id}>
                       <TableCell>{ad.name}</TableCell>
                       <TableCell className="text-muted-foreground">{set.name}</TableCell>
+                      <TableCell className="max-w-xs truncate text-muted-foreground">
+                        {ad.link ? pathOf(ad.link) : "—"}
+                      </TableCell>
                       <TableCell>
                         <Badge variant="secondary">{ad.status}</Badge>
                       </TableCell>

@@ -107,21 +107,36 @@ export interface FbNamedEntity {
   status: string;
 }
 
-export async function listCampaigns(): Promise<FbNamedEntity[]> {
-  const out = await fbGet<{ data?: { id?: string; name?: string; status?: string }[] }>(
-    `${adAccountPath()}/campaigns`,
-    { fields: "id,name,status", limit: "200" },
-  );
+export async function listCampaigns(): Promise<FbCampaignDetail[]> {
+  const out = await fbGet<{
+    data?: {
+      id?: string;
+      name?: string;
+      status?: string;
+      objective?: string;
+      daily_budget?: string;
+    }[];
+  }>(`${adAccountPath()}/campaigns`, {
+    fields: "id,name,status,objective,daily_budget",
+    limit: "200",
+  });
   return (out.data ?? [])
-    .filter((r): r is { id: string; name: string; status: string } =>
-      Boolean(r.id && r.name),
-    )
-    .filter((r) => r.status !== "DELETED");
+    .filter((r) => r.id && r.name && r.status !== "DELETED")
+    .map((r) => ({
+      id: r.id as string,
+      name: r.name as string,
+      status: r.status as string,
+      objective: r.objective ?? null,
+      dailyBudgetUsd: r.daily_budget ? Number(r.daily_budget) / 100 : null,
+    }));
 }
 
 export interface FbAdSet extends FbNamedEntity {
   campaignId: string | null;
   dailyBudgetUsd: number | null;
+  optimizationGoal: string | null;
+  pixelId: string | null;
+  customEventType: string | null;
 }
 
 export interface FbCampaignDetail extends FbNamedEntity {
@@ -151,13 +166,24 @@ export interface FbAd {
   name: string;
   status: string;
   adSetId: string;
+  link: string | null;
+  urlTags: string | null;
 }
 
 export async function listAds(): Promise<FbAd[]> {
   const out = await fbGet<{
-    data?: { id?: string; name?: string; status?: string; adset_id?: string }[];
+    data?: {
+      id?: string;
+      name?: string;
+      status?: string;
+      adset_id?: string;
+      creative?: {
+        url_tags?: string;
+        object_story_spec?: { link_data?: { link?: string } };
+      };
+    }[];
   }>(`${adAccountPath()}/ads`, {
-    fields: "id,name,status,adset_id",
+    fields: "id,name,status,adset_id,creative{url_tags,object_story_spec}",
     limit: "200",
   });
   return (out.data ?? [])
@@ -167,28 +193,38 @@ export async function listAds(): Promise<FbAd[]> {
       name: r.name as string,
       status: r.status as string,
       adSetId: r.adset_id ?? "",
+      link: r.creative?.object_story_spec?.link_data?.link ?? null,
+      urlTags: r.creative?.url_tags ?? null,
     }));
 }
 
 export async function listAdSets(): Promise<FbAdSet[]> {
   const out = await fbGet<{
-    data?: { id?: string; name?: string; status?: string; campaign_id?: string; daily_budget?: string }[];
+    data?: {
+      id?: string;
+      name?: string;
+      status?: string;
+      campaign_id?: string;
+      daily_budget?: string;
+      optimization_goal?: string;
+      promoted_object?: { pixel_id?: string; custom_event_type?: string };
+    }[];
   }>(`${adAccountPath()}/adsets`, {
-    fields: "id,name,status,campaign_id,daily_budget",
+    fields: "id,name,status,campaign_id,daily_budget,optimization_goal,promoted_object",
     limit: "200",
   });
   return (out.data ?? [])
-    .filter((r): r is { id: string; name: string; status: string } & typeof r =>
-      Boolean(r.id && r.name),
-    )
-    .filter((r) => r.status !== "DELETED")
+    .filter((r) => r.id && r.name && r.status !== "DELETED")
     .map((r) => ({
-      id: r.id,
-      name: r.name,
-      status: r.status,
+      id: r.id as string,
+      name: r.name as string,
+      status: r.status as string,
       campaignId: r.campaign_id ?? null,
       // Meta money fields are cents (minor units) as strings.
       dailyBudgetUsd: r.daily_budget ? Number(r.daily_budget) / 100 : null,
+      optimizationGoal: r.optimization_goal ?? null,
+      pixelId: r.promoted_object?.pixel_id ?? null,
+      customEventType: r.promoted_object?.custom_event_type ?? null,
     }));
 }
 
