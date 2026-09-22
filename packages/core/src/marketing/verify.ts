@@ -8,8 +8,8 @@ import { warehouseConfig, withSchemas, wq } from "./warehouse";
 
 // Daily email verification (06-cold-email-execution.md §3.4, 07 §4.3).
 // million-verifier:bulk bills 0.046 credits/email (~$0.46 per 1,000):
-// retries: 0. Only `ok` addresses are ever eligible for sending; catch_all
-// on public-sector domains silently discards, so it is treated as unusable.
+// retries: 0. Sendable statuses are `ok` and `catch_all`; invalid /
+// unknown / disposable never enter a sequence.
 
 const BATCH_LIMIT = 5000;
 

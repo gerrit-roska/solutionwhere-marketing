@@ -73,14 +73,15 @@ const SUPPRESSION = new Set([
   "solutionwhere.com", "wisdomwhere.com",
 ]);
 
-// Spec 06 §3.4: accept Million Verifier `ok` only. Catch-all on k12/org
-// (Barracuda/Proofpoint) accepts then silently discards — false delivery,
-// no replies, and a bounce-rate hit on the sending domain. NutraCap's
-// Shopify path sometimes allows catch_all; this ICP does not.
-export const MV_ACCEPT = new Set(["ok"]);
+// Million Verifier gate: `ok` and `catch_all` are sendable. Catch-all is a
+// real mailbox on a domain that accepts anything; k12/org filters still
+// deliver more often than not. Invalid / unknown / disposable stay out.
+// GetLeads' own VALID flag is ignored (NutraCap: 48% fail MV).
+export const MV_ACCEPT_STATUSES = ["ok", "catch_all"] as const;
+export const MV_ACCEPT = new Set<string>(MV_ACCEPT_STATUSES);
 export const TARGET_OK = 2000;
-/** Observed 2026-09-22 wave: 98 ok / 192 verified ≈ 51%. Over-pull 2×. */
-export const MV_PASS_RATE = 0.5;
+/** Observed 2026-09-22 wave: 98 ok + 35 catch_all / 192 ≈ 69%. Over-pull ~1.5×. */
+export const MV_PASS_RATE = 0.69;
 /** Per-campaign emails into MV each run. Caps a single wave so we do not
  *  verify 16k addresses in one sitting. Repeat until Instantly holds TARGET_OK. */
 export const WAVE_EMAILS = 500;

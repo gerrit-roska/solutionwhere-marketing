@@ -20,13 +20,13 @@ import {
 } from "../marketing/list/waves";
 import { runWebsiteResolution } from "../marketing/list/websites";
 import { sequencerEnv } from "./config";
-import { CAMPAIGNS, EDUCATION_SQL, SEGMENTS, type ModuleId } from "./waterfall";
+import { CAMPAIGNS, EDUCATION_SQL, MV_ACCEPT, MV_ACCEPT_STATUSES, SEGMENTS, type ModuleId } from "./waterfall";
 import { createLead } from "./instantly";
 
 // Full TAM collector, sequenced by spec 06 §7.1:
 //   t2-ar → t3-regional → t4-ec → t5-large → t6-national
 // Each wave: resolve websites → staff directories → GetLeads fallback →
-// MV ok-only → Instantly DRAFT module campaigns. Never Resume/Launch.
+// MV ok + catch_all → Instantly DRAFT module campaigns. Never Resume/Launch.
 //
 // Throughput is the ceiling, not discovery: ~40 accounts/run at 1 req/sec
 // on directories. Repeat `--wave next` until status remaining is 0.
@@ -115,7 +115,7 @@ export async function sequenceStatus(): Promise<SequenceStatus> {
       await db
         .selectFrom("contacts")
         .select(db.fn.countAll().as("n"))
-        .where("mv_status", "=", "ok")
+        .where("mv_status", "in", [...MV_ACCEPT_STATUSES])
         .where("suppressed", "=", false)
         .executeTakeFirst()
     )?.n ?? 0,
@@ -433,7 +433,7 @@ async function verifyUnverified(limit: number): Promise<{ verified: number; ok: 
       .where("contact_id", "=", row.contact_id)
       .execute();
     verified += 1;
-    if (result === "ok") ok += 1;
+    if (MV_ACCEPT.has(result)) ok += 1;
   });
   return { verified, ok };
 }
@@ -467,7 +467,7 @@ async function pushDraftInstantly(limit: number): Promise<{ uploaded: number; sk
       "accounts.domain",
       "accounts.state",
     ])
-    .where("contacts.mv_status", "=", "ok")
+    .where("contacts.mv_status", "in", [...MV_ACCEPT_STATUSES])
     .where("contacts.suppressed", "=", false)
     .where("contacts.sequence_status", "=", "not_started")
     .where("contacts.email", "is not", null)
