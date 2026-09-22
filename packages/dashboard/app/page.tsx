@@ -13,6 +13,7 @@ import {
 import { loadMetaAdsAccount } from "@app/core/marketing/warehouse";
 import { loadClientConfig } from "@app/core/seo/config";
 import { CAMPAIGNS } from "@app/core/ads/plan";
+import { loadFbConfig } from "@app/core/fb/config";
 import { Database, TriangleAlert } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -182,12 +183,33 @@ function formatMoney(value: number): string {
   });
 }
 
+function loadFbLaunch(): {
+  name: string;
+  dailyBudgetUsd: number;
+  adSets: { module: string; name: string }[];
+} | null {
+  try {
+    const fb = loadFbConfig();
+    return {
+      name: fb.campaign.name,
+      dailyBudgetUsd: fb.campaign.dailyBudgetUsd,
+      adSets: Object.entries(fb.campaign.adSetsByModule).map(([module, name]) => ({
+        module,
+        name,
+      })),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export default async function OverviewPage() {
   const [data, warehouse, metaAccount] = await Promise.all([
     loadOverview(),
     loadWarehouseOverview(),
     loadMetaAdsAccount(),
   ]);
+  const fbLaunch = loadFbLaunch();
   const sources = warehouseConfig() as unknown as Record<string, string>;
 
   return (
@@ -228,6 +250,7 @@ export default async function OverviewPage() {
         warehouse={warehouse}
         seo={"error" in data ? { error: data.error } : data}
         publishing={publishingLine()}
+        fbLaunch={fbLaunch}
       />
 
       {"error" in data ? (
@@ -420,17 +443,23 @@ function SourceSections({
   warehouse,
   seo,
   publishing,
+  fbLaunch,
 }: {
   warehouse: WarehouseOverview;
   seo: OverviewData | { error: string };
   publishing: string;
+  fbLaunch: {
+    name: string;
+    dailyBudgetUsd: number;
+    adSets: { module: string; name: string }[];
+  } | null;
 }) {
   return (
     <>
       <SearchConsoleSection result={warehouse.searchConsole} />
       <SeoSection data={seo} publishing={publishing} />
       <GoogleAdsSection result={warehouse.googleAds} />
-      <MetaSection result={warehouse.metaAds} />
+      <MetaSection result={warehouse.metaAds} launch={fbLaunch} />
       <InstantlySection result={warehouse.instantly} />
       <Ga4Section result={warehouse.ga4} />
       <CrmSection result={warehouse.crm} />
@@ -703,17 +732,63 @@ function GoogleAdsSection({ result }: { result: LoadResult<GoogleAdsData> }) {
   );
 }
 
-function MetaSection({ result }: { result: LoadResult<MetaData> }) {
+function MetaSection({
+  result,
+  launch,
+}: {
+  result: LoadResult<MetaData>;
+  launch: {
+    name: string;
+    dailyBudgetUsd: number;
+    adSets: { module: string; name: string }[];
+  } | null;
+}) {
   const copy = stateCopy("Meta Ads", result);
   const data = result.status === "ok" ? result.data : null;
   return (
     <SourceCard
       title="Facebook / Meta Ads"
-      description="Account identity from account_history. Campaign spend appears when basic_campaign is in the warehouse."
+      description="Solutionwhere - Primary. One campaign budget, shared across the four module ad sets. Spend appears here once campaign tables sync."
       schema={result.schema}
       connected={result.status !== "not-connected"}
     >
       {copy ? <p className="text-sm text-muted-foreground">{copy}</p> : null}
+      {launch ? (
+        <div className="mb-4 space-y-3">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Campaign</p>
+              <p className="text-lg font-semibold">{launch.name}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Daily budget</p>
+              <p className="text-2xl font-semibold tabular-nums">
+                {formatMoney(launch.dailyBudgetUsd)}
+              </p>
+            </div>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Ad set</TableHead>
+                <TableHead>Module</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {launch.adSets.map((row) => (
+                <TableRow key={row.name}>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell className="text-muted-foreground">{row.module}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <p className="text-sm text-muted-foreground">
+            Five statics per ad set, light and dark. Nothing is spending. The
+            campaign is created paused when the approved squares are uploaded.
+          </p>
+        </div>
+      ) : null}
       {data ? (
         <div className="space-y-4">
           {data.account ? (
