@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import { CRAWL_USER_AGENT, domainOf, recordRun, sleep, upsertAccount } from "./shared";
+import { priorityFor } from "./waves";
 
 // AESA member directory — regional education service agencies (06 §2.2).
 // ~482 members across 39 states; the Find page caps at 50/page, so iterate
@@ -71,7 +72,7 @@ export async function runAesa(): Promise<void> {
         website: websiteHref ?? null,
         state: stateMatch?.[1] ?? "US",
         modules_fit: ["pd", "coaching"],
-        priority_tier: 3,
+        priority_tier: priorityFor(stateMatch?.[1] ?? "US", "esa"),
         source: "aesa-directory",
         source_url: url,
       });

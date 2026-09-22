@@ -15,6 +15,7 @@ import {
   sleep,
   suppressedDomains,
 } from "./shared";
+import { applyAccountScope, type AccountScope } from "./waves";
 
 // Staff-directory extraction (06 §3.1): public agencies publish staff
 // directories, most with plain-text emails. 200 accounts per night, max
@@ -130,25 +131,31 @@ function extractNameTitleOnly(html: string): FoundPerson[] {
   return people;
 }
 
-export async function runDirectories(): Promise<void> {
+export async function runDirectories(opts?: {
+  limit?: number;
+  scope?: AccountScope;
+}): Promise<void> {
   await recordRun("staff-directories", async () => {
     const db = getDb();
     let seen = 0;
     let added = 0;
 
-    const due = await db
-      .selectFrom("accounts")
-      .select(["account_id", "account_name", "account_type", "website", "domain", "modules_fit"])
-      .where("suppressed", "=", false)
-      .where("website", "is not", null)
-      .where((eb) =>
-        eb.or([
-          eb("last_verified", "is", null),
-          eb("last_verified", "<", sql<Date>`current_date - 90`),
-        ]),
-      )
-      .orderBy("priority_tier", "asc")
-      .limit(ACCOUNTS_PER_NIGHT)
+    const due = await applyAccountScope(
+      db
+        .selectFrom("accounts")
+        .select(["account_id", "account_name", "account_type", "website", "domain", "modules_fit"])
+        .where("suppressed", "=", false)
+        .where("website", "is not", null)
+        .where((eb) =>
+          eb.or([
+            eb("last_verified", "is", null),
+            eb("last_verified", "<", sql<Date>`current_date - 90`),
+          ]),
+        )
+        .orderBy("priority_tier", "asc"),
+      opts?.scope,
+    )
+      .limit(opts?.limit ?? ACCOUNTS_PER_NIGHT)
       .execute();
 
     for (const account of due) {

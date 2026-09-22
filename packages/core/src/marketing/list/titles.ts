@@ -170,3 +170,30 @@ export function matchTitle(rawTitle: string): TitleMatch | null {
   }
   return best;
 }
+
+/** Broader ICP match for GetLeads rows whose titles don't contain the
+ *  exact dictionary phrase (e.g. "PD Director" vs "director of professional
+ *  development"). Superintendents stay excluded. */
+export function matchTitleLoose(rawTitle: string): TitleMatch | null {
+  const exact = matchTitle(rawTitle);
+  if (exact) return exact;
+  const title = rawTitle.toLowerCase();
+  if (NEVER_FIRST_CONTACT.some((t) => title.includes(t))) return null;
+  if (
+    /professional development|professional learning|staff development|curriculum|teaching and learning/.test(
+      title,
+    )
+  ) {
+    return { module: "pd", rank: 4 };
+  }
+  if (/enroll|school choice|student services|registrar/.test(title)) {
+    return { module: "enrollments", rank: 4 };
+  }
+  if (/instructional coach|early childhood|quality improvement|technical assistance/.test(title)) {
+    return { module: "coaching", rank: 4 };
+  }
+  if (/child care resource|ccr&r|referral/.test(title)) {
+    return { module: "referrals", rank: 4 };
+  }
+  return null;
+}

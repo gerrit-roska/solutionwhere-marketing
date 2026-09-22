@@ -10,6 +10,7 @@ import {
 } from "../marketing/list/directories";
 import { matchTitle } from "../marketing/list/titles";
 import { sleep } from "../marketing/list/shared";
+import { ARKANSAS_ESCS } from "../marketing/list/waves";
 import { createLead } from "./instantly";
 
 // NutraCap-shaped people waterfall (not NCES agencies):
@@ -32,7 +33,7 @@ export const CAMPAIGNS = {
 
 export type ModuleId = keyof typeof CAMPAIGNS;
 
-const EDUCATION_SQL =
+export const EDUCATION_SQL =
   "org_industry_linkedin IN ('Primary and Secondary Education','Education Management','Education')";
 
 const SKIP_TITLE = [
@@ -72,42 +73,25 @@ const SUPPRESSION = new Set([
   "solutionwhere.com", "wisdomwhere.com",
 ]);
 
-const ARKANSAS_ESCS: { name: string; domain: string; url: string }[] = [
-  { name: "Arch Ford ESC", domain: "archford.org", url: "https://www.archford.org/" },
-  { name: "Arkansas River ESC", domain: "aresc.k12.ar.us", url: "http://www.aresc.k12.ar.us/" },
-  { name: "Crowley's Ridge EC", domain: "crowleys.k12.ar.us", url: "http://www.crowleys.k12.ar.us/" },
-  { name: "Dawson ESC", domain: "dawsonesc.com", url: "https://www.dawsonesc.com/" },
-  { name: "DeQueen/Mena ESC", domain: "dmesc.org", url: "http://www.dmesc.org/" },
-  { name: "Great Rivers ESC", domain: "greatrivers.net", url: "https://www.greatrivers.net/" },
-  { name: "Guy Fenter ESC", domain: "gfesc.us", url: "https://www.gfesc.us/" },
-  { name: "Northcentral Arkansas ESC", domain: "naesc.k12.ar.us", url: "https://www.naesc.k12.ar.us/" },
-  { name: "Northeast Arkansas EC", domain: "nea.k12.ar.us", url: "http://nea.k12.ar.us/" },
-  { name: "Northwest Arkansas ESC", domain: "nwaesc.org", url: "https://www.nwaesc.org/" },
-  { name: "OUR ESC", domain: "oursc.k12.ar.us", url: "https://www.oursc.k12.ar.us/" },
-  { name: "South Central SC", domain: "scscoop.org", url: "http://www.scscoop.org/" },
-  { name: "Southeast Arkansas ESC", domain: "searkcoop.com", url: "https://www.searkcoop.com/" },
-  { name: "Southwest Arkansas EC", domain: "swaec.org", url: "https://www.swaec.org/" },
-  { name: "Wilbur D. Mills ESC", domain: "wilbur.k12.ar.us", url: "http://www.wilbur.k12.ar.us/" },
-];
-
-// Spec 06 §3.4: accept Million Verifier `ok` only. Catch-all on k12/org
-// (Barracuda/Proofpoint) accepts then silently discards — false delivery,
-// no replies, and a bounce-rate hit on the sending domain. NutraCap's
-// Shopify path sometimes allows catch_all; this ICP does not.
-export const MV_ACCEPT = new Set(["ok"]);
+// Million Verifier gate: `ok` and `catch_all` are sendable. Catch-all is a
+// real mailbox on a domain that accepts anything; k12/org filters still
+// deliver more often than not. Invalid / unknown / disposable stay out.
+// GetLeads' own VALID flag is ignored (NutraCap: 48% fail MV).
+export const MV_ACCEPT_STATUSES = ["ok", "catch_all"] as const;
+export const MV_ACCEPT = new Set<string>(MV_ACCEPT_STATUSES);
 export const TARGET_OK = 2000;
-/** Observed 2026-09-22 wave: 98 ok / 192 verified ≈ 51%. Over-pull 2×. */
-export const MV_PASS_RATE = 0.5;
+/** Observed 2026-09-22 wave: 98 ok + 35 catch_all / 192 ≈ 69%. Over-pull ~1.5×. */
+export const MV_PASS_RATE = 0.69;
 /** Per-campaign emails into MV each run. Caps a single wave so we do not
  *  verify 16k addresses in one sitting. Repeat until Instantly holds TARGET_OK. */
 export const WAVE_EMAILS = 500;
 
-interface Segment {
+export interface WaterfallSegment {
   id: ModuleId;
   jobTitles: string[];
 }
 
-const SEGMENTS: Segment[] = [
+export const SEGMENTS: WaterfallSegment[] = [
   {
     id: "pd",
     jobTitles: [
@@ -340,7 +324,7 @@ export async function mapTam(alreadyOk: Record<string, number> = {}): Promise<Ta
   return rows;
 }
 
-async function searchGetleads(segment: Segment, pull: number): Promise<WaterfallLead[]> {
+async function searchGetleads(segment: WaterfallSegment, pull: number): Promise<WaterfallLead[]> {
   const withEmail: WaterfallLead[] = [];
   const nameless: WaterfallLead[] = [];
   let offset = 0;

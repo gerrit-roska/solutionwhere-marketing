@@ -3,6 +3,7 @@ import { runAesa } from "./aesa";
 import { runDirectories } from "./directories";
 import { runWebsiteResolution } from "./websites";
 import { runGetleadsEnrichment } from "./enrich";
+import { stampPriorityTiers } from "./waves";
 
 // Nightly rotation (07 §4.2): one source per night, tracked in source_runs.
 //   Sun    NCES CCD LEA universe (annual data; monthly re-run is harmless)
@@ -18,6 +19,7 @@ import { runGetleadsEnrichment } from "./enrich";
 // manual runs (e.g. `FORCE_SOURCE=nces npm run job:list-build-nightly`).
 
 export async function run(): Promise<void> {
+  await stampPriorityTiers();
   const force = process.env.FORCE_SOURCE;
   const day = new Date().getDay(); // 0 = Sunday
 
