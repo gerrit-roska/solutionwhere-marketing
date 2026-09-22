@@ -25,7 +25,8 @@
     "job:fb-creative-factory-weekly": "npm run -w @app/jobs job:fb-creative-factory-weekly --",
     "job:fb-upload-drafts-weekly": "npm run -w @app/jobs job:fb-upload-drafts-weekly --",
     "job:fb-manage-daily": "npm run -w @app/jobs job:fb-manage-daily --",
-    "job:ads-guardrails-daily": "npm run -w @app/jobs job:ads-guardrails-daily --"
+    "job:ads-guardrails-daily": "npm run -w @app/jobs job:ads-guardrails-daily --",
+    "job:leads-waterfall": "npm run -w @app/jobs job:leads-waterfall --"
   },
   "dependencies": {
     "tsx": "^4.19.2"

@@ -21,7 +21,7 @@ import {
 // 1 request/domain/second, standard path probe then give up quietly —
 // accounts with nothing get last_verified stamped so the rotation moves on.
 
-const DIRECTORY_PATHS = [
+export const DIRECTORY_PATHS = [
   "/staff",
   "/directory",
   "/staff-directory",
@@ -35,7 +35,7 @@ const DIRECTORY_PATHS = [
 const ACCOUNTS_PER_NIGHT = 200;
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 
-interface FoundContact {
+export interface FoundContact {
   name: string;
   title: string;
   email: string;
@@ -47,7 +47,7 @@ interface FoundPerson {
   title: string;
 }
 
-async function fetchOk(url: string): Promise<string | null> {
+export async function fetchDirectoryPage(url: string): Promise<string | null> {
   try {
     const response = await fetch(url, {
       headers: { "User-Agent": CRAWL_USER_AGENT },
@@ -64,7 +64,7 @@ async function fetchOk(url: string): Promise<string | null> {
 }
 
 /** Pulls name/title/email rows out of arbitrary directory markup. */
-function extractContacts(html: string): FoundContact[] {
+export function extractDirectoryContacts(html: string): FoundContact[] {
   const $ = cheerio.load(html);
   const contacts: FoundContact[] = [];
 
@@ -115,7 +115,7 @@ function extractNameTitleOnly(html: string): FoundPerson[] {
   for (const el of rows) {
     const text = $(el).text().replace(/\s+/g, " ").trim();
     if (text.length === 0 || text.length > 300) continue;
-    if (text.match(EMAIL_RE)) continue; // visible emails go through extractContacts
+    if (text.match(EMAIL_RE)) continue; // visible emails go through extractDirectoryContacts
     if (!matchTitle(text)) continue;
     const name = $(el)
       .find("td, th, strong, b, h3, h4, h5, span, p")
@@ -159,10 +159,10 @@ export async function runDirectories(): Promise<void> {
       let contacts: FoundContact[] = [];
       let directoryHtml: string | null = null;
       for (const path of DIRECTORY_PATHS) {
-        const html = await fetchOk(new URL(path, base).toString());
+        const html = await fetchDirectoryPage(new URL(path, base).toString());
         await sleep(1000); // 1 req/domain/sec (06 §3.1)
         if (!html) continue;
-        contacts = extractContacts(html);
+        contacts = extractDirectoryContacts(html);
         if (contacts.length > 0) {
           directoryHtml = html;
           break;

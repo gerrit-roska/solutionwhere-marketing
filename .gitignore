@@ -10,3 +10,5 @@ exports/
 # purpose — it only holds the account id linking this repo to Graphed.)
 .graphed/plugins
 *.tsbuildinfo
+# People-waterfall checkpoints (emails + MV run ids)
+data/leads-waterfall/

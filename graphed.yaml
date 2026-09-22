@@ -124,4 +124,14 @@ services:
 #     - SLACK_WEBHOOK_URL
 #   retries: 0
 #   timeout_seconds: 900
+#
+# leads-waterfall (GetLeads people → MV ok-only → Instantly draft):
+# 500 emails/module/run toward 2,000 ok each. Campaigns stay draft.
+#   leads-waterfall:
+#     command: npm run job:leads-waterfall
+#     schedule: { cron: 0 4 * * 1-5, timezone: America/New_York }
+#     env:
+#       - INSTANTLY_API_KEY
+#     retries: 0
+#     timeout_seconds: 7200
 jobs: {}
