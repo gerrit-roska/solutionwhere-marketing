@@ -1,4 +1,5 @@
 import { CRAWL_USER_AGENT, domainOf, recordRun, upsertAccount } from "./shared";
+import { priorityFor } from "./waves";
 
 // NCES CCD LEA universe — the spine of the district list (06 §2.1).
 //
@@ -82,6 +83,7 @@ export async function runNces(): Promise<void> {
             nces_leaid: row.leaid ?? null,
             enrollment,
             modules_fit: modulesFit,
+            priority_tier: priorityFor(row.state_location, "district"),
             source: "nces-ccd",
             source_url: `https://educationdata.urban.org/api/v1/school-districts/ccd/directory/${START_YEAR}/`,
           });
@@ -99,6 +101,7 @@ export async function runNces(): Promise<void> {
             county: row.county_name ?? null,
             nces_leaid: row.leaid ?? null,
             modules_fit: ["pd", "coaching"],
+            priority_tier: priorityFor(row.state_location, "esa"),
             source: "nces-ccd",
           });
           if (isNew) added += 1;
