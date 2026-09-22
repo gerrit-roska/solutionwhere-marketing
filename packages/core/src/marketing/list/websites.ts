@@ -1,6 +1,7 @@
 import { getDb } from "../../db";
 import { graphed } from "../graphed";
 import { domainOf, recordRun, sleep } from "./shared";
+import { applyAccountScope, type AccountScope } from "./waves";
 
 // Website resolution (FDE-530): the Urban CCD API carries no usable website
 // field, so accounts arrive with website NULL and the staff-directory crawl
@@ -62,6 +63,7 @@ function pickOfficialSite(result: SerperResult): string | null {
 
 export async function runWebsiteResolution(
   limit: number = BATCH_LIMIT,
+  scope?: AccountScope,
 ): Promise<void> {
   await recordRun("website-resolution", async () => {
     const db = getDb();
@@ -69,13 +71,16 @@ export async function runWebsiteResolution(
     let added = 0;
     let updated = 0;
 
-    const due = await db
-      .selectFrom("accounts")
-      .select(["account_id", "account_name", "account_type", "state", "city"])
-      .where("suppressed", "=", false)
-      .where("website", "is", null)
-      .orderBy("priority_tier", "asc")
-      .orderBy("enrollment", "desc")
+    const due = await applyAccountScope(
+      db
+        .selectFrom("accounts")
+        .select(["account_id", "account_name", "account_type", "state", "city"])
+        .where("suppressed", "=", false)
+        .where("website", "is", null)
+        .orderBy("priority_tier", "asc")
+        .orderBy("enrollment", "desc"),
+      scope,
+    )
       .limit(limit)
       .execute();
 
