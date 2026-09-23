@@ -1,3 +1,4 @@
+import { assertNoBlockedClaims } from "../marketing/claim-qa";
 import { adAccountPath, fbEnv, loadFbConfig } from "./config";
 
 // Meta Marketing API transport (04 §6, 07 §4.10). Mirrors ads/client.ts:
@@ -338,9 +339,17 @@ interface LinkCopy {
   link: string;
 }
 
+function assertAdCopy(fields: LinkCopy): void {
+  assertNoBlockedClaims(
+    [fields.primaryText, fields.headline, fields.description ?? ""].join("\n"),
+    "Facebook ad",
+  );
+}
+
 export function createImageAdCreative(
   fields: LinkCopy & { name: string; pageId: string; imageHash: string; urlTags: string },
 ): Promise<{ id: string }> {
+  assertAdCopy(fields);
   return createAdCreative(fields.name, fields.pageId, fields.urlTags, {
     page_id: fields.pageId,
     link_data: {
@@ -357,6 +366,7 @@ export function createImageAdCreative(
 export function createVideoAdCreative(
   fields: LinkCopy & { name: string; pageId: string; videoId: string; thumbnailUrl: string; urlTags: string },
 ): Promise<{ id: string }> {
+  assertAdCopy(fields);
   return createAdCreative(fields.name, fields.pageId, fields.urlTags, {
     page_id: fields.pageId,
     video_data: {

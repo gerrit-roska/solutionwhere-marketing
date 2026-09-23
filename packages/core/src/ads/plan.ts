@@ -1,3 +1,5 @@
+import { findBlockedClaims } from "../marketing/claim-qa";
+
 // The Google Ads account plan, encoded literally from
 // docs/03-google-ads-execution.md. If a number or keyword here disagrees with
 // the spec, the spec is right and this file is wrong.
@@ -1226,6 +1228,15 @@ export function validatePlan(): string[] {
       for (const d of group.rsa.descriptions) {
         if (d.length > 90) errors.push(`${group.key}: description ${d.length} chars (>90)`);
       }
+      const claimText = [
+        ...group.rsa.headlines,
+        ...group.rsa.descriptions,
+        group.rsa.path1 ?? "",
+        group.rsa.path2 ?? "",
+      ].join("\n");
+      for (const hit of findBlockedClaims(claimText)) {
+        errors.push(`${group.key}: claim QA: ${hit}`);
+      }
       for (const keyword of group.keywords) {
         if (keyword.text.length > 80) errors.push(`${group.key}: keyword "${keyword.text}" >80 chars`);
         if (keyword.text.split(" ").length > 10) {
@@ -1233,6 +1244,14 @@ export function validatePlan(): string[] {
         }
       }
     }
+  }
+  const assetText = [
+    ...SITELINKS.flatMap((link) => [link.text, link.desc1, link.desc2]),
+    ...CALLOUTS,
+    ...STRUCTURED_SNIPPETS.flatMap((snippet) => [snippet.header, ...snippet.values]),
+  ].join("\n");
+  for (const hit of findBlockedClaims(assetText)) {
+    errors.push(`account asset claim QA: ${hit}`);
   }
   return errors;
 }

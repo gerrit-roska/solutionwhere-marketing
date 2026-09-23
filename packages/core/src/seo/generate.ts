@@ -1,3 +1,4 @@
+import { assertNoBlockedClaims } from "../marketing/claim-qa";
 import type { ClientConfig, GeneratedArticle } from "./types";
 import { sanitizeArticleMarkdown } from "./markdown";
 import { loadPlaybooks, type Playbooks } from "./playbooks";
@@ -297,6 +298,10 @@ Return JSON with exactly these keys: markdown (the corrected article), correctio
   const markdown = sanitizeArticleMarkdown(stripDashes(checked.markdown), title);
   const meta_description = truncateMetaDescription(
     stripDashes(editedRaw.meta_description),
+  );
+  assertNoBlockedClaims(
+    [title, excerpt, meta_description, markdown].join("\n"),
+    "SEO article",
   );
   return {
     title,

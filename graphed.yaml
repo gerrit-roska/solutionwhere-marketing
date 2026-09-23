@@ -137,4 +137,15 @@ services:
 #       - INSTANTLY_API_KEY
 #     retries: 0
 #     timeout_seconds: 7200
-jobs: {}
+# Blog route is live (bwaxman/solutionwhere-website#2 merged 2026-09-23).
+# Serper and Exa are not project secrets, so drafts use the Graphed
+# OpenRouter proxy without live SERP grounding until those are added.
+jobs:
+  seo-publish-daily:
+    command: npm run job:seo-publish-daily
+    schedule: { cron: 0 12 * * 1-5, timezone: America/New_York }
+    env:
+      - STRAPI_API_URL
+      - STRAPI_API_TOKEN
+    retries: 0
+    timeout_seconds: 5400

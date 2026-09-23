@@ -1,6 +1,7 @@
 import { loadMatrix } from "../creative/factory";
 import { getDb } from "../db";
 import { fireAlert, postSlack } from "../marketing/alerts";
+import { findBlockedClaims } from "../marketing/claim-qa";
 import { getBytes, presignGet } from "../marketing/storage";
 import {
   createAd,
@@ -102,6 +103,10 @@ function planUpload(
   if (!persona) return { skipReason: `persona '${row.persona}' not in matrix.json` };
   if (!row.headline || !row.primary_text) {
     return { skipReason: "missing headline/primary_text" };
+  }
+  const claimHits = findBlockedClaims(`${row.headline}\n${row.primary_text}`);
+  if (claimHits.length > 0) {
+    return { skipReason: `claim QA: ${claimHits.join(", ")}` };
   }
   if (!row.file_key) return { skipReason: "missing file_key" };
   return {
