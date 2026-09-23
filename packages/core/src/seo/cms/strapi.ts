@@ -1,5 +1,5 @@
 import type { CmsAdapter, ClientConfig, PublishInput, PublishResult } from "../types";
-import { markdownToHtml } from "../markdown";
+import { markdownToHtml, sanitizeArticleMarkdown } from "../markdown";
 
 // Strapi is different from Ghost/WordPress: every instance defines its own
 // content types, so there is no universal "post" shape. The adapter is driven
@@ -53,7 +53,10 @@ function parseInlineText(text: string): StrapiTextChild[] {
   return children.length > 0 ? children : [{ type: "text", text: "" }];
 }
 
-export function markdownToStrapiBlocks(markdown: string): StrapiBlock[] {
+export function markdownToStrapiBlocks(
+  markdown: string,
+  title?: string,
+): StrapiBlock[] {
   const blocks: StrapiBlock[] = [];
   let listItems: string[] | null = null;
   let listFormat: "ordered" | "unordered" = "unordered";
@@ -74,7 +77,9 @@ export function markdownToStrapiBlocks(markdown: string): StrapiBlock[] {
     listItems = null;
   };
 
-  for (const rawLine of markdown.replace(/\r\n/g, "\n").split("\n")) {
+  for (const rawLine of sanitizeArticleMarkdown(markdown, title)
+    .replace(/\r\n/g, "\n")
+    .split("\n")) {
     const line = rawLine.trim();
     if (!line) {
       flushList();
@@ -195,10 +200,13 @@ export function createStrapiAdapter(options: {
   function buildPayload(input: PublishInput): { data: Record<string, unknown> } {
     const body =
       bodyFormat === "blocks"
-        ? markdownToStrapiBlocks(input.article.markdown)
+        ? markdownToStrapiBlocks(input.article.markdown, input.article.title)
         : bodyFormat === "html"
-          ? markdownToHtml(input.article.markdown)
-          : input.article.markdown;
+          ? markdownToHtml(input.article.markdown, input.article.title)
+          : sanitizeArticleMarkdown(
+              input.article.markdown,
+              input.article.title,
+            );
 
     const data: Record<string, unknown> = {
       [fields.title]: input.article.title,

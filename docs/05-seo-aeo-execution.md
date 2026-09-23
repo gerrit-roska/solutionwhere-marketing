@@ -101,7 +101,7 @@ Standalone URLs at the root, one per named system. These are the highest-volume 
 | `/plu` | plu georgia | 90 | georgia plu credits 10 |
 | `/cpe-texas` | cpe hours texas | 30 | tea cpe 20 |
 
-**Each hub page:** what the system is (one liftable sentence), who it applies to, how many hours/units per cycle, how to check your hours (link to the state portal — do not try to be the portal), how to submit, what districts and providers are responsible for, and a section for the administrator: *"Tracking [system] across your staff."* That last section carries the Wisdomwhere CTA. 1,000–1,500 words, FAQ schema, visible last-verified date.
+**Each hub page:** what the system is (one liftable sentence), who it applies to, how many hours/units per cycle, how to check your hours (link to the state portal — do not try to be the portal), how to submit, what districts and providers are responsible for, and a section for the administrator: *"Tracking [system] across your staff."* That last section carries the Solutionwhere CTA. 1,000–1,500 words, FAQ schema, visible last-verified date.
 
 The searcher is usually a teacher. That is fine: the page's job is topical authority plus catching the district administrator who searches the same term. Do **not** retarget these visitors — they stay out of the retargeting ad set (`04` §6).
 
@@ -134,7 +134,7 @@ how to renew teaching license in {state}
 Each page must contain, in this order:
 
 1. **A one-sentence definitional opener.** "To renew a standard teaching license in Ohio, educators must complete 180 contact hours or 18 CEUs over a five-year cycle and have them approved by a Local Professional Development Committee (LPDC)." — This sentence is what an LLM lifts. Write it to be liftable.
-2. **Requirements table:** license type, renewal cycle length, hours required, unit of measure, who approves, submission deadline, fee.
+2. **Requirements in prose (not a markdown table).** Cover license type, renewal cycle length, hours required, unit of measure, who approves, submission deadline, and fee. Strapi cannot render pipe tables; they publish as raw `|` rows. Use a short bullet list only when a list of certificate types is clearer than paragraphs.
 3. **The state's credit system named explicitly** (see §3.4). This is the term with real search intent.
 4. **Step-by-step renewal process**, numbered.
 5. **Where districts get this wrong** — the section that converts. Districts are responsible for tracking and reporting these hours, and most do it in spreadsheets.
@@ -186,7 +186,7 @@ They are **not** meant to convert on the page. They are meant to:
 - Give the `PD | State-Compliance` Google Ads campaign (`03` §3.8) a relevant landing page
 - Support the AI-answer play in §6 — these are exactly the factual, structured pages models cite
 
-The conversion mechanism on these pages is a single contextual link to `/professional-development` framed for the *district administrator* who lands here, not the teacher: "Responsible for tracking this across your staff? See how districts manage it."
+The conversion mechanism on these pages is a closing section for the *district administrator* who lands here, not the teacher, plus a contextual line pointing at `/professional-development`: "Responsible for tracking this across your staff? See how districts manage it in Solutionwhere." Never name Wisdomwhere on these pages.
 
 ---
 

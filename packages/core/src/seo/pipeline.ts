@@ -8,6 +8,7 @@ import {
   strapiCredentials,
   wordpressCredentials,
 } from "./config";
+import { assertNoBlockedClaims } from "../marketing/claim-qa";
 import { generateArticle } from "./generate";
 import { markdownToHtml } from "./markdown";
 import type { ClientConfig, CmsAdapter } from "./types";
@@ -97,6 +98,15 @@ export async function runSeoPipeline(
       serperApiKey: config.serperApiKey,
       exaApiKey: config.exaApiKey,
     });
+    assertNoBlockedClaims(
+      [
+        article.title,
+        article.excerpt,
+        article.meta_description,
+        article.markdown,
+      ].join("\n"),
+      "SEO article",
+    );
 
     await db
       .insertInto("seo_articles")
@@ -136,7 +146,7 @@ export async function runSeoPipeline(
       (await adapter.publish({
         slug: keyword.slug,
         article,
-        html: markdownToHtml(article.markdown),
+        html: markdownToHtml(article.markdown, article.title),
       }));
 
     await db

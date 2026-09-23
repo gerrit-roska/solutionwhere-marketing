@@ -733,6 +733,7 @@ At this volume every reply is read by a human. There is no autoresponder.
 [ ] Million Verifier bulk verification, ok-only filter (§3.4)
 [ ] Sequencer configured, one campaign per module per wave (§5.5)
 [ ] 4 sequences written with state-specific peer references (§6)
+[ ] No WCAG or SOC 2 claim, and no named customer, in the sequence copy. Leave {{peer_agency}} blank until Benjamin clears the name
 [ ] Reply-handling SLA agreed with the AE (§8)
 [ ] RFP keyword alerts set (§2.7)
 [ ] Warmup complete, first cold-domain wave sends          ← ~21 days after purchase

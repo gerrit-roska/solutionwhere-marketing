@@ -1,4 +1,6 @@
+import { assertNoBlockedClaims } from "../marketing/claim-qa";
 import type { ClientConfig, GeneratedArticle } from "./types";
+import { sanitizeArticleMarkdown } from "./markdown";
 import { loadPlaybooks, type Playbooks } from "./playbooks";
 import { buildResearchBrief } from "./research";
 
@@ -21,7 +23,12 @@ const HOUSE_RULES = `Hard rules (never violated):
 - No hyperlinks or URLs anywhere in the article body.
 - No em dashes or en dashes anywhere; use commas, periods, or colons.
 - No temporal references that age: no "this year", "currently", "recently", "as of".
-- No fabricated first-person experience: never "in my experience" or "clients tell me".`;
+- No fabricated first-person experience: never "in my experience" or "clients tell me".
+- No markdown tables, pipe tables, dashed separator rows, or ASCII diagrams. The CMS cannot render them.
+- Do not repeat the article title as a heading in the body.
+- Never write Wisdomwhere or Wisdomware. The company name is Solutionwhere.
+- Never claim WCAG or SOC 2 compliance, and never say Solutionwhere is certified.
+- Never name a customer, district, or agency as a Solutionwhere user.`;
 
 function stripDashes(value: string): string {
   return value
@@ -177,7 +184,7 @@ export async function generateArticle(options: {
 
   const cta =
     config.content.ctaText && config.content.ctaUrl
-      ? `\n- End the article with one short call to action pointing readers at "${config.content.ctaText}". Do not include the URL in the body; it is rendered separately.`
+      ? `\n- End the article with a short closing H2 for the district administrator, then one or two short paragraphs, ending with this sentence: "${config.content.ctaText}". Do not include a URL. Never write Wisdomwhere.`
       : "";
 
   const voice = `You are writing original SEO content for ${config.client.name} (${config.client.siteUrl}).
@@ -286,12 +293,20 @@ Return JSON with exactly these keys: markdown (the corrected article), correctio
         : "clean",
   });
 
+  const title = stripDashes(editedRaw.title);
+  const excerpt = stripDashes(editedRaw.excerpt);
+  const markdown = sanitizeArticleMarkdown(stripDashes(checked.markdown), title);
+  const meta_description = truncateMetaDescription(
+    stripDashes(editedRaw.meta_description),
+  );
+  assertNoBlockedClaims(
+    [title, excerpt, meta_description, markdown].join("\n"),
+    "SEO article",
+  );
   return {
-    title: stripDashes(editedRaw.title),
-    excerpt: stripDashes(editedRaw.excerpt),
-    markdown: stripDashes(checked.markdown),
-    meta_description: truncateMetaDescription(
-      stripDashes(editedRaw.meta_description),
-    ),
+    title,
+    excerpt,
+    markdown,
+    meta_description,
   };
 }

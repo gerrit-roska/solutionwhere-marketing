@@ -2,6 +2,11 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { projectRoot } from "../config";
 import { getDb } from "../db";
+import {
+  assertNoBlockedClaims,
+  findBlockedClaims,
+  redactBlockedClaims,
+} from "../marketing/claim-qa";
 import { chat } from "../marketing/graphed";
 import { getBytes, presignGet, putBytes, putText } from "../marketing/storage";
 import { renderAvatarVideo } from "./heygen";
@@ -127,14 +132,17 @@ async function writeCopy(
         "ONLY a JSON object: {\"primaryText\": string, \"headline\": string, " +
         "\"description\": string}. Hard limits: primaryText ≤ 125 characters, " +
         "headline ≤ 40 characters, description ≤ 30 characters. No emojis. " +
-        "No feature lists.",
+        "No feature lists. Never claim WCAG or SOC 2 compliance. Never name " +
+        "a customer, district, or agency.",
     },
     {
       role: "user",
       content:
         `Persona: ${persona.name}. Angle: ${ANGLE_NAMES[row.angle] ?? row.angle}.\n` +
-        (row.hook ? `Hook: "${row.hook}".\n` : "This is a product-demo ad; the visual carries it.\n") +
-        `Pain: "${persona.pain}". Proof: ${persona.proof}.\n` +
+        (row.hook
+          ? `Hook: "${redactBlockedClaims(row.hook)}".\n`
+          : "This is a product-demo ad; the visual carries it.\n") +
+        `Pain: "${persona.pain}". Proof: ${redactBlockedClaims(persona.proof)}.\n` +
         `The headline must be unique — do not reuse any of these: ${[...usedHeadlines].join(" | ") || "(none yet)"}.`,
     },
   ]);
@@ -147,6 +155,10 @@ async function writeCopy(
     description: String(parsed.description ?? "").slice(0, 60),
   };
   if (!copy.headline) throw new Error("copy writer returned an empty headline");
+  assertNoBlockedClaims(
+    [copy.primaryText, copy.headline, copy.description].join("\n"),
+    "Facebook ad copy",
+  );
   return copy;
 }
 
@@ -236,6 +248,14 @@ export async function runCreativeFactory(
       continue;
     }
     const landing = `${matrix.landingBase}${persona.landing}`;
+    const claimHits = findBlockedClaims(row.hook ?? "");
+    if (claimHits.length > 0) {
+      result.skipped.push({
+        creative_id: row.creative_id,
+        reason: `claim QA: ${claimHits.join(", ")}`,
+      });
+      continue;
+    }
 
     for (const format of row.formats) {
       if (done.has(`${row.creative_id}:${format}`)) {
