@@ -34,6 +34,7 @@
 | 7 | Keyword Planner access | Comes with the Ads account; needed for §3 volume pass | Bid setting |
 | 8 | Auto-tagging ON, `gclid` preserved through the demo form | Settings → Account settings → Auto-tagging | Attribution |
 | 9 | Customer list uploaded for exclusion | The 30+ existing PD customers — see §6.4 | Waste prevention |
+| 10 | No WCAG or SOC 2 claim, and no named customer, in RSA copy, sitelinks, or callouts | `validatePlan()` blocks these before any upload | Launch |
 
 ### 1.1 Measured volumes — READ `08-keyword-research.md` BEFORE BUILDING
 

@@ -236,4 +236,5 @@ The agent never raises total daily spend more than 30% in a day. The failure mod
 [ ] CAMP 01 live, broad, Advantage+, $50/day, optimization = Lead
 [ ] fb-manage-daily running: kill / scale / flip / brief / Slack, 30% cap enforced
 [ ] Token-expiry alert at day 50
+[ ] No WCAG or SOC 2 claim, and no named customer, district, or agency in the ad copy or on the image
 ```

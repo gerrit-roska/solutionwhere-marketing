@@ -12,6 +12,7 @@ import {
   pauseCampaign,
 } from "../packages/core/src/email/instantly";
 import { projectRoot } from "../packages/core/src/config";
+import { findBlockedClaims } from "../packages/core/src/marketing/claim-qa";
 
 // Pushes data/sequences.json into Instantly as paused template campaigns
 // (docs/06 §5–§6). Does not activate, does not attach mailboxes, does not
@@ -67,6 +68,10 @@ function assertCleanCopy(seq: SequenceFile["sequences"][number]): void {
   }
   if (/231-935-3000|\+1 ?231/.test(text)) {
     throw new Error(`phone number in sequence ${seq.id}`);
+  }
+  const claimHits = findBlockedClaims(text);
+  if (claimHits.length > 0) {
+    throw new Error(`claim QA in sequence ${seq.id}: ${claimHits.join(", ")}`);
   }
 }
 
