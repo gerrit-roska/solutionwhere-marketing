@@ -1,0 +1,38 @@
+{
+  "name": "Solutionwhere statics",
+  "source": "Base layout is the approved P1-A1 static (80% less time on registration admin). Offer copy comes from clients/solutionwhere/creative/matrix.json angles A1–A5, one set per CAMP 01 ad set.",
+  "format": {
+    "aspectRatio": "1:1",
+    "placement": "Meta feed. Square, not vertical."
+  },
+  "layout": [
+    "Logo locked at the top",
+    "One short offer line under the logo: the product and the result, about eight to twelve words",
+    "A browser frame below the offer showing the real module screenshot",
+    "One button under the screenshot that reads exactly: Book a demo",
+    "Small decorative dots only. No icon row, no second window, no extra caption"
+  ],
+  "logo": "clients/fb/assets/reference_image/product_images/logo-solutionwhere.png — blue center dot, orange and blue ring dots, solution in orange, where in blue. Do not redraw it.",
+  "modes": {
+    "dark": "Navy background #152033, white headline. This is the approved base.",
+    "light": "Warm off-white background #F6F3EE, navy headline #1B3048. Same composition."
+  },
+  "whatWins": [
+    "The image carries the product and the result in one line, plus a Book a demo button. Headline, primary text, and description travel with the ad and are not stacked on the picture.",
+    "The product screenshot is the proof. Keep the real UI. Do not invent dashboards.",
+    "High contrast. Dark or light, never a muddy middle.",
+    "No URL, no phone number, no file names, no people, no children, no stock photos."
+  ],
+  "forbidden": [
+    "WISDOMWHERE or any invented product name",
+    "A second window, Finder, desktop, or filenames",
+    "home.solutionwhere.com or any web address",
+    "A different logo than the dotted mark"
+  ],
+  "adSets": {
+    "pd": "AS 01 | Broad - PD",
+    "enrollments": "AS 02 | Broad - Enrollments",
+    "coaching": "AS 03 | Broad - Coaching",
+    "referrals": "AS 04 | Broad - Referrals"
+  }
+}
