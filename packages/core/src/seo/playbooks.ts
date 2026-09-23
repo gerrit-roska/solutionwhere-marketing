@@ -22,16 +22,25 @@ export const DEFAULT_PLAYBOOKS: Record<PlaybookStage, string> = {
 - Note every statistic, date, price, or named product you see — the fact-check stage will only allow claims traceable to this material.`,
   outline: `- 5-8 H2 sections. The first section must directly answer the core query before any background or context.
 - If the keyword implies comparison ("best", "vs", "alternatives"), include exactly one comparison or list section.
-- Never outline an "introduction" or "conclusion" section — the first H2 starts the substance.
+- Never outline an "introduction" or "conclusion" section, and never use the article title as an H2. The first H2 starts the substance.
+- End the outline with a short closing section that is the call to action.
 - Points under each section are claims the draft must make; make them specific, not "discuss X".`,
   draft: `- Follow the outline exactly; do not add or drop sections.
-- Write for skimmers: short paragraphs, concrete numbers over adjectives, lists where the outline has parallel points.
+- Write for skimmers: short paragraphs, concrete numbers over adjectives.
+- Use a bullet or numbered list only when a set of discrete items is clearer as a list than as prose (for example a step-by-step process). Do not turn every section into bullets.
+- Do not emit markdown tables, pipe tables, dashed separator rows, ASCII grids, or diagrams. The CMS cannot render them.
+- Do not repeat the article title as a heading in the body. Do not start the markdown with an H1.
 - First sentence of every section must say something a skim reader values — no "When it comes to X, ..." openers.`,
   edit: `- Cut 15-25% of the words. Delete filler, keep claims.
 - Kill formulaic phrases: "in today's world", "it's important to note", "look no further", "game-changer".
-- Every sentence must survive the "so what" test for the target audience — if a section doesn't help them decide or do something, rewrite it until it does.`,
+- Every sentence must survive the "so what" test for the target audience — if a section doesn't help them decide or do something, rewrite it until it does.
+- If the draft still has a markdown table or pipe-row formatting, rewrite those rows as prose or a short list.
+- Strip a leading heading that repeats the article title.
+- Keep the closing call to action. Do not drop it.`,
   factcheck: `- Only statistics, dates, prices, rankings, and named-product capabilities count as factual claims — opinions and general advice do not.
 - A claim passes if it is traceable to the research material. Anything else: soften it to general language ("many users report", "pricing varies") or delete it.
+- Never claim WCAG or SOC 2 compliance, and never say Solutionwhere is certified. Delete those lines.
+- Never name a customer, district, or agency as a Solutionwhere user. Lyons Township, On Track by 5, Washoe County School District, and LPSS are customers. Delete those lines.
 - Never add citations, footnotes, or links. Never silently change the meaning — list every change you make in corrections.`,
 };
 

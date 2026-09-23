@@ -136,7 +136,7 @@ export async function runSeoPipeline(
       (await adapter.publish({
         slug: keyword.slug,
         article,
-        html: markdownToHtml(article.markdown),
+        html: markdownToHtml(article.markdown, article.title),
       }));
 
     await db

@@ -503,7 +503,7 @@ Then follow `.graphed/plugins/seo/AGENT.md` step by step. Verified steps: copy `
   },
   "content": {
     "defaultWordCount": 1400,
-    "ctaText": "See how districts track this in Wisdomwhere",
+    "ctaText": "Responsible for tracking this across your staff? See how districts manage it in Solutionwhere",
     "ctaUrl": "https://home.solutionwhere.com/professional-development"
   },
   "cms": { "type": "none" },
@@ -514,8 +514,8 @@ Then follow `.graphed/plugins/seo/AGENT.md` step by step. Verified steps: copy `
 `cms.type` is `none` because the site is a Next.js app on Vercel, not Ghost/WordPress/Strapi. The kit writes drafts to `seo_articles`; a separate step (`packages/core/src/seo/export-mdx.ts`, hand-written) renders `status = 'generated'` rows to MDX files and opens a PR against the site repo. Nothing auto-publishes.
 
 **Playbook edits** (dashboard → `/seo` → Playbook & Test tab) before the first cron run — the kit stores overrides in `seo_playbooks`:
-- Outline stage: first paragraph must be one liftable definitional sentence naming the state and the credit system.
-- Draft stage: require a requirements table (license type, cycle, hours, unit, approver, deadline, fee) and a "Where districts get this wrong" section.
+- Outline stage: first paragraph must be one liftable definitional sentence naming the state and the credit system. Last section is a Solutionwhere CTA for the district administrator. Never name Wisdomwhere.
+- Draft stage: cover requirements in prose (license type, cycle, hours, unit, approver, deadline, fee). No markdown tables or pipe tables (Strapi cannot render them). Bullet lists only when a list is clearer than prose. Include a "Where districts get this wrong" section.
 - Fact-check stage: any renewal-requirement figure not traceable to the research brief is replaced with "not published by the state; contact your district's certification officer." Never softened, always replaced.
 
 **Seed the queue** from `05` §3 via the dashboard CSV import. Slugs must match the existing pattern:
@@ -532,7 +532,7 @@ Do **not** queue the comparison or trust pages (`05` §4, §5.2). Competitor fac
 **Acceptance:**
 ```
 [ ] npm run job:seo-publish-daily locally → one seo_keywords row 'generated', one seo_articles row with markdown, zero CMS calls
-[ ] First five generated state pages read by a human; requirements table present; no invented figures
+[ ] First five generated state pages read by a human; requirements covered in prose (no pipe tables); Solutionwhere CTA at the end; no invented figures
 [ ] /seo metrics strip renders GSC numbers under `graphed dev run -- npm run dev`
 [ ] graphed jobs run seo-publish-daily in the cloud → logs show a completed run
 [ ] Cron cadence: one page per weekday. Raise by editing `schedule.cron`, not by running it twice
